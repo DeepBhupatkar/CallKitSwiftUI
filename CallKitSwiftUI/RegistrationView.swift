@@ -66,7 +66,7 @@ struct RegistrationView: View {
                         .foregroundColor(.gray)
                 }
                 .padding()
-                .background(Color.gray.opacity(0.2))
+                .background(Color.indigo.opacity(0.2))
                 .cornerRadius(8)
             }
             

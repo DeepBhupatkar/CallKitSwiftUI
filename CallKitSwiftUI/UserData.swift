@@ -16,6 +16,12 @@ class UserData: ObservableObject {
     @Published var selectedUser: User? = nil // Track selected user for editing
     @Published var callerID: String = "" // Store the caller ID
     
+    
+    
+    private let callerIDKey = "callerIDKey" // Key for UserDefaults
+    
+    
+    
     init() {
         fetchData()
     }
@@ -35,6 +41,7 @@ class UserData: ObservableObject {
                 print("Error adding document: \(error.localizedDescription)")
             } else {
                 print("Document added successfully")
+                self?.storeCallerID(callerID) // Store the caller ID locally
                 self?.fetchData()
                 self?.newName = "" // Clear input field after adding
             }
@@ -42,38 +49,39 @@ class UserData: ObservableObject {
     }
     
     func registerUser(name: String, completion: @escaping (Bool) -> Void) {
-           let callerID = generateUniqueCallerID()
-           Firestore.firestore().collection("users").addDocument(data: [
-               "name": name,
-               "callerID": callerID
-           ]) { [weak self] error in
-               if let error = error {
-                   print("Error adding document: \(error.localizedDescription)")
-                   completion(false)
-               } else {
-                   print("Document added successfully")
-                   self?.fetchData()
-                   completion(true)
-               }
-           }
-       }
+            let callerID = generateUniqueCallerID()
+            Firestore.firestore().collection("users").addDocument(data: [
+                "name": name,
+                "callerID": callerID
+            ]) { [weak self] error in
+                if let error = error {
+                    print("Error adding document: \(error.localizedDescription)")
+                    completion(false)
+                } else {
+                    print("Document added successfully")
+                    self?.storeCallerID(callerID) // Store the caller ID locally
+                    self?.fetchData()
+                    completion(true)
+                }
+            }
+        }
        
-       func fetchData() {
-           Firestore.firestore().collection("users").getDocuments { [weak self] snapshot, error in
-               if let error = error {
-                   print("Error fetching documents: \(error.localizedDescription)")
-               } else {
-                   if let snapshot = snapshot {
-                       self?.users = snapshot.documents.map { doc in
-                           let data = doc.data()
-                           let name = data["name"] as? String ?? ""
-                           let callerID = data["callerID"] as? String ?? ""
-                           return User(id: doc.documentID, name: name, callerID: callerID)
-                       }
-                   }
-               }
-           }
-       }
+    func fetchData() {
+         Firestore.firestore().collection("users").getDocuments { [weak self] snapshot, error in
+             if let error = error {
+                 print("Error fetching documents: \(error.localizedDescription)")
+             } else {
+                 if let snapshot = snapshot {
+                     self?.users = snapshot.documents.map { doc in
+                         let data = doc.data()
+                         let name = data["name"] as? String ?? ""
+                         let callerID = data["callerID"] as? String ?? ""
+                         return User(id: doc.documentID, name: name, callerID: callerID)
+                     }
+                 }
+             }
+         }
+     }
     
     func updateData() {
         guard let selectedUser = selectedUser else { return }
@@ -106,21 +114,20 @@ class UserData: ObservableObject {
         isEditActive = true // Activate edit mode
         selectedUser = user // Store the selected user for updating
     }
+
     
-    
-    
-    // Function to fetch caller ID (You need to implement the logic to get the caller ID from Firebase)
     func fetchCallerID() {
-        // Example of fetching caller ID (You should replace it with your actual data fetching logic)
-        Firestore.firestore().collection("users").document("umgImKpCgHXMV2ekcxQq").getDocument { document, error in
-            if let document = document, document.exists {
-                let data = document.data()
-                self.callerID = data?["callerID"] as? String ?? "Unknown"
-            } else {
-                print("Document does not exist")
-            }
+           // Retrieve the caller ID from UserDefaults
+           if let savedCallerID = UserDefaults.standard.string(forKey: callerIDKey) {
+               self.callerID = savedCallerID
+           }
+       }
+        
+        func storeCallerID(_ callerID: String) {
+            // Save the caller ID to UserDefaults
+            UserDefaults.standard.set(callerID, forKey: callerIDKey)
         }
-    }
+    
 
 
 }
