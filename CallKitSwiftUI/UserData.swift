@@ -466,26 +466,121 @@ class UserData: ObservableObject {
 
     
     
-    func initiateCall(otherUserID: String) {
-        fetchCallerInfo { [weak self] callerInfo in
+//    func initiateCall(otherUserID: String) {
+//        fetchCallerInfo { [weak self] callerInfo in
+//            guard let callerInfo = callerInfo else {
+//                print("Error fetching caller info")
+//                return
+//            }
+//    
+//            self?.fetchCalleeInfo(callerID: otherUserID) { calleeInfo in
+//                guard let calleeInfo = calleeInfo else {
+//                    print("Error fetching callee info")
+//                    return
+//                }
+//    
+//                // Use callerInfo and calleeInfo as needed
+//                print("Caller Info: \(callerInfo)")
+//                print("Callee Info: \(calleeInfo)")
+//            }
+//        }
+//    }
+    
+    
+    
+//    func initiateCall(otherUserID: String, completion: @escaping (CallerInfo?, CalleeInfo?, VideoSDKInfo?) -> Void) {
+//        fetchCallerInfo { callerInfo in
+//            guard let callerInfo = callerInfo else {
+//                print("Error fetching caller info")
+//                completion(nil, nil, nil)
+//                return
+//            }
+//            
+//            self.fetchCalleeInfo(callerID: otherUserID) { calleeInfo in
+//                guard let calleeInfo = calleeInfo else {
+//                    print("Error fetching callee info")
+//                    completion(nil, nil, nil)
+//                    return
+//                }
+//                
+//                // Use callerInfo and calleeInfo as needed
+//                let videoSDKInfo = VideoSDKInfo()
+//                completion(callerInfo, calleeInfo, videoSDKInfo)
+//            }
+//        }
+//        
+//    }
+    
+    
+    func initiateCall(otherUserID: String, completion: @escaping (CallerInfo?, CalleeInfo?, VideoSDKInfo?) -> Void) {
+        fetchCallerInfo { callerInfo in
             guard let callerInfo = callerInfo else {
                 print("Error fetching caller info")
+                completion(nil, nil, nil)
                 return
             }
-    
-            self?.fetchCalleeInfo(callerID: otherUserID) { calleeInfo in
+
+            self.fetchCalleeInfo(callerID: otherUserID) { calleeInfo in
                 guard let calleeInfo = calleeInfo else {
                     print("Error fetching callee info")
+                    completion(nil, nil, nil)
                     return
                 }
-    
+
                 // Use callerInfo and calleeInfo as needed
-                print("Caller Info: \(callerInfo)")
-                print("Callee Info: \(calleeInfo)")
+                let videoSDKInfo = VideoSDKInfo() // Initialize as needed
+                completion(callerInfo, calleeInfo, videoSDKInfo)
+
+                // Create a CallRequest
+                let callRequest = CallRequest(callerInfo: callerInfo, calleeInfo: calleeInfo, videoSDKInfo: videoSDKInfo)
+                self.sendCallRequest(callRequest) { result in
+                    switch result {
+                    case .success(let data):
+                        // Handle successful response
+                        print("Call request successful: \(String(describing: data))")
+                    case .failure(let error):
+                        // Handle error
+                        print("Error sending call request: \(error)")
+                    }
+                }
             }
         }
     }
-    
-    
 
+    // MARK: API
+
+    public func sendCallRequest(_ request: CallRequest, completion: @escaping (Result<Data?, Error>) -> Void) {
+        guard let url = URL(string: "http://192.168.22.132:3000/initiate-call") else {
+            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
+            return
+        }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        do {
+            let jsonData = try JSONEncoder().encode(request)
+            urlRequest.httpBody = jsonData
+
+            let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+                if let error = error {
+                    completion(.failure(error))
+                } else if let response = response as? HTTPURLResponse, response.statusCode == 200 {
+                    completion(.success(data))
+                } else {
+                    let error = NSError(domain: "API Error", code: (response as? HTTPURLResponse)?.statusCode ?? -1, userInfo: nil)
+                    completion(.failure(error))
+                }
+            }
+            task.resume()
+        } catch {
+            completion(.failure(error))
+        }
+    }
+
+    
+    
+    
+    
 }

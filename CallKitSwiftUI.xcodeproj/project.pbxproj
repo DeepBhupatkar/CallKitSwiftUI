@@ -340,6 +340,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CallKitSwiftUI/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow this app to use Camera ";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow this app to use Microphone ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -374,6 +375,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CallKitSwiftUI/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow this app to use Camera ";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow this app to use Microphone ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
