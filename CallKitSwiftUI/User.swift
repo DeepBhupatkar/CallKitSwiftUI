@@ -11,4 +11,6 @@ struct User: Identifiable {
     let id: String
     let name: String
     let callerID: String
+    let deviceToken : String
+
 }

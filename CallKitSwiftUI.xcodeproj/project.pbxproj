@@ -22,6 +22,10 @@
 		2C6F86D72C58FF4E00A2527E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6F86D62C58FF4E00A2527E /* User.swift */; };
 		2C6F86D92C58FF6C00A2527E /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6F86D82C58FF6C00A2527E /* UserData.swift */; };
 		2CC125592C59042E0086E6FF /* RegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC125582C59042E0086E6FF /* RegistrationView.swift */; };
+		2CD096E32C59F1BB00391D2E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD096E22C59F1BB00391D2E /* AppDelegate.swift */; };
+		2CD096E52C5A118700391D2E /* InitiateCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD096E42C5A118700391D2E /* InitiateCall.swift */; };
+		2CD096E72C5A1C1F00391D2E /* InitiateCallInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD096E62C5A1C1F00391D2E /* InitiateCallInfo.swift */; };
+		2CD096E92C5A2F4300391D2E /* CallRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD096E82C5A2F4300391D2E /* CallRequest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +39,12 @@
 		2C6F86D62C58FF4E00A2527E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		2C6F86D82C58FF6C00A2527E /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
 		2CC125582C59042E0086E6FF /* RegistrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationView.swift; sourceTree = "<group>"; };
+		2CD096E02C59EEDE00391D2E /* CallKitSwiftUI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CallKitSwiftUI.entitlements; sourceTree = "<group>"; };
+		2CD096E12C59EEE400391D2E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2CD096E22C59F1BB00391D2E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2CD096E42C5A118700391D2E /* InitiateCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiateCall.swift; sourceTree = "<group>"; };
+		2CD096E62C5A1C1F00391D2E /* InitiateCallInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiateCallInfo.swift; sourceTree = "<group>"; };
+		2CD096E82C5A2F4300391D2E /* CallRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallRequest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +83,8 @@
 		2C6F86B22C58E53000A2527E /* CallKitSwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				2CD096E12C59EEE400391D2E /* Info.plist */,
+				2CD096E02C59EEDE00391D2E /* CallKitSwiftUI.entitlements */,
 				2CC125582C59042E0086E6FF /* RegistrationView.swift */,
 				2C6F86C52C58F26D00A2527E /* GoogleService-Info.plist */,
 				2C6F86B32C58E53000A2527E /* CallKitSwiftUIApp.swift */,
@@ -82,6 +94,10 @@
 				2C6F86C32C58EFDE00A2527E /* ContentView.swift */,
 				2C6F86D62C58FF4E00A2527E /* User.swift */,
 				2C6F86D82C58FF6C00A2527E /* UserData.swift */,
+				2CD096E22C59F1BB00391D2E /* AppDelegate.swift */,
+				2CD096E42C5A118700391D2E /* InitiateCall.swift */,
+				2CD096E62C5A1C1F00391D2E /* InitiateCallInfo.swift */,
+				2CD096E82C5A2F4300391D2E /* CallRequest.swift */,
 			);
 			path = CallKitSwiftUI;
 			sourceTree = "<group>";
@@ -176,12 +192,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CD096E52C5A118700391D2E /* InitiateCall.swift in Sources */,
 				2C6F86D72C58FF4E00A2527E /* User.swift in Sources */,
 				2C6F86C22C58EB4800A2527E /* CallView.swift in Sources */,
 				2C6F86B42C58E53000A2527E /* CallKitSwiftUIApp.swift in Sources */,
 				2CC125592C59042E0086E6FF /* RegistrationView.swift in Sources */,
+				2CD096E32C59F1BB00391D2E /* AppDelegate.swift in Sources */,
+				2CD096E72C5A1C1F00391D2E /* InitiateCallInfo.swift in Sources */,
 				2C6F86D92C58FF6C00A2527E /* UserData.swift in Sources */,
 				2C6F86C42C58EFDE00A2527E /* ContentView.swift in Sources */,
+				2CD096E92C5A2F4300391D2E /* CallRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,17 +332,22 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CallKitSwiftUI/CallKitSwiftUI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CallKitSwiftUI/Preview Content\"";
 				DEVELOPMENT_TEAM = 8GZ776NSU2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CallKitSwiftUI/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Allow this app to use Camera ";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow this app to use Microphone ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -341,17 +366,22 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CallKitSwiftUI/CallKitSwiftUI.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CallKitSwiftUI/Preview Content\"";
 				DEVELOPMENT_TEAM = 8GZ776NSU2;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CallKitSwiftUI/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Allow this app to use Camera ";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Allow this app to use Microphone ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

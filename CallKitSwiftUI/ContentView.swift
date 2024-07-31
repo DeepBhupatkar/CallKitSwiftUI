@@ -115,10 +115,12 @@ import FirebaseFirestore
 
 struct ContentView: View {
     @StateObject private var userData = UserData() // Fetch user data
-    @State private var otherUserID: String = ""
+    @State private var otherUserID: String = "" // Use this to set the ID to verify
     @State private var isCallViewActive: Bool = false
     @State private var isNewUser: Bool = false
     @State private var isLoading: Bool = true
+    
+    @StateObject private var viewModel = InitiateCall()
 
     var body: some View {
         NavigationView {
@@ -141,7 +143,7 @@ struct ContentView: View {
                             .foregroundColor(.white)
 
                         HStack(spacing: 10) {
-                            Text(userData.callerID)
+                            Text(userData.fetchCallerID() ?? "null")
                                 .font(.title)
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
@@ -174,22 +176,40 @@ struct ContentView: View {
 
                 Spacer()
 
-                // Call Now Button
-                NavigationLink(destination: CallView(), isActive: $isCallViewActive) {
-                    Button(action: {
-                        // Call Now button action
-                        isCallViewActive = true
-                    }) {
-                        Text("Call Now")
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .cornerRadius(12)
-                    }
-                    .padding(.horizontal)
-                }
+//                // Call Now Button
+//                NavigationLink(destination: CallView(), isActive: $isCallViewActive) {
+//                    Button(action: {
+//                        // Call Now button action
+//                        isCallViewActive = true
+//                    }) {
+//                        Text("Call Now")
+//                            .fontWeight(.bold)
+//                            .foregroundColor(.white)
+//                            .padding()
+//                            .frame(maxWidth: .infinity)
+//                            .background(Color.blue)
+//                            .cornerRadius(12)
+//                    }
+//                    .padding(.horizontal)
+//                }
+               
+                
+                Button("Verify Caller ID") {
+                                  userData.verifyCallerID(otherUserID) { user in
+                                      if let user = user {
+                                          print("User details: \(user)")
+                                          // Handle successful verification, e.g., update UI or navigate to another view
+                                      } else {
+                                          print("User not found")
+                                          // Handle case where user is not found
+                                      }
+                                  }
+                              }
+                
+                Button("Start Call") {
+                    userData.initiateCall(otherUserID: otherUserID)
+
+                           }
 
                 Spacer()
 
