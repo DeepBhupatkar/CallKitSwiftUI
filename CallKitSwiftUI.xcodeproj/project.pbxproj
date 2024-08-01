@@ -26,6 +26,7 @@
 		2CD096E52C5A118700391D2E /* InitiateCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD096E42C5A118700391D2E /* InitiateCall.swift */; };
 		2CD096E72C5A1C1F00391D2E /* InitiateCallInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD096E62C5A1C1F00391D2E /* InitiateCallInfo.swift */; };
 		2CD096E92C5A2F4300391D2E /* CallRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD096E82C5A2F4300391D2E /* CallRequest.swift */; };
+		2CD331092C5A68CE008B7736 /* NotificationNameExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD331082C5A68CE008B7736 /* NotificationNameExtension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		2CD096E42C5A118700391D2E /* InitiateCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiateCall.swift; sourceTree = "<group>"; };
 		2CD096E62C5A1C1F00391D2E /* InitiateCallInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InitiateCallInfo.swift; sourceTree = "<group>"; };
 		2CD096E82C5A2F4300391D2E /* CallRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallRequest.swift; sourceTree = "<group>"; };
+		2CD331082C5A68CE008B7736 /* NotificationNameExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationNameExtension.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +100,7 @@
 				2CD096E42C5A118700391D2E /* InitiateCall.swift */,
 				2CD096E62C5A1C1F00391D2E /* InitiateCallInfo.swift */,
 				2CD096E82C5A2F4300391D2E /* CallRequest.swift */,
+				2CD331082C5A68CE008B7736 /* NotificationNameExtension.swift */,
 			);
 			path = CallKitSwiftUI;
 			sourceTree = "<group>";
@@ -192,6 +195,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2CD331092C5A68CE008B7736 /* NotificationNameExtension.swift in Sources */,
 				2CD096E52C5A118700391D2E /* InitiateCall.swift in Sources */,
 				2C6F86D72C58FF4E00A2527E /* User.swift in Sources */,
 				2C6F86C22C58EB4800A2527E /* CallView.swift in Sources */,
