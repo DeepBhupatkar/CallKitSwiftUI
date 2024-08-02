@@ -587,6 +587,18 @@ struct ContentView: View {
                     }
                 }
 
+                Button("FCM") {
+                    userData.generateFCMToken { token in
+                        if let token = token {
+                            print("Generated FCM Token: \(token)")
+                            // Use the token as needed, for example:
+                            // userData.saveFCMToken(token)
+                        } else {
+                            print("Failed to generate FCM token")
+                        }
+                    }
+                }
+                
                 Spacer()
 
                 // Add New User Button

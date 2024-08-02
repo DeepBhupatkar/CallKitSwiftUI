@@ -49,3 +49,13 @@ struct CallInfoUpdateAPI : Codable
     let callerID: String
     let deviceToken : String
 }
+
+
+struct CallIeeenfoUpdateAPI : Codable
+{
+    let id: String
+    let name: String
+    let callerID: String
+    let deviceToken : String
+}
+
