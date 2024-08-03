@@ -7,42 +7,45 @@
 
 import Foundation
 
-
-
-
-
 // USER A : the user who Initiate the call to other user (USER B)
-struct CallerInfo: Identifiable {
+struct CallerInfo: Codable {
     let id: String
     let name: String
     let callerID: String
     let deviceToken : String
 
 }
-
 
 // USER B : the user who going to recive call from (USER A)
-struct CalleeInfo: Identifiable {
+struct CalleeInfo: Codable {
     let id: String
     let name: String
     let callerID: String
     let deviceToken : String
 
 }
-
-
-
-
-
-
-
 //Meeting Info Can Be Static
-struct VideoSDKInfo: Identifiable {
-    let id: String
-    let name: String
-    let callerID: String
-    let deviceToken : String
+struct VideoSDKInfo: Codable {
+    var id: String = "123"
+    var name: String = "VideoSDKExample"
+    var callerID: String = "12341241"
+    var deviceToken : String = "123412413423"
 
 }
 
 
+
+struct CallRequest: Codable {
+    let callerInfo: CallerInfo
+    let calleeInfo: CalleeInfo
+    let videoSDKInfo: VideoSDKInfo
+}
+
+
+struct CallInfoUpdateAPI : Codable
+{
+    let id: String
+    let name: String
+    let callerID: String
+    let deviceToken : String
+}

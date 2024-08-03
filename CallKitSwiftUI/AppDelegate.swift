@@ -367,14 +367,18 @@ extension AppDelegate: CXProviderDelegate {
     func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
         configureAudioSession()
         startCapturingVideo() // Start video capture when starting a call
+        NotificationCenter.default.post(name: .callingStarted, object: nil)
         action.fulfill()
     }
-    
+
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         configureAudioSession()
         startCapturingVideo() // Start video capture when answering a call
+        NotificationCenter.default.post(name: .callAnswered, object: nil)
+        NotificationCenter.default.post(name: .callAccepted, object: nil)
         action.fulfill()
     }
+
     
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         stopCapturingVideo() // Stop video capture when ending a call
