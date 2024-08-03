@@ -172,6 +172,9 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 
+import FirebaseMessaging
+
+
 class UserData: ObservableObject {
     @Published var users: [User] = []
     @Published var newName = ""
@@ -180,7 +183,8 @@ class UserData: ObservableObject {
     @Published var callerID: String = "" // Store the caller ID
     @Published var otherUserID: String = "" //Store OtherUserID (Which Enter By User To make call to otherUser)
     
-    public var otherUserIDUPdate : String = ""
+    public var otherUserIDUPdate : String = "71464"
+    
     
     
     private let callerIDKey = "callerIDKey" // Key for UserDefaults
@@ -494,6 +498,7 @@ class UserData: ObservableObject {
                             let callerID = data["callerID"] as? String ?? ""
 
                             let calleeInfo = CalleeInfo(id: document.documentID, name: name, callerID: callerID, deviceToken: deviceToken)
+                             
                             completion(calleeInfo)
                           
                         } else {
@@ -557,10 +562,7 @@ class UserData: ObservableObject {
     
     
     func initiateCall(otherUserID: String, completion: @escaping (CallerInfo?, CalleeInfo?, VideoSDKInfo?) -> Void) {
-        
-                
-        
-        
+    
         fetchCallerInfo { callerInfo in
             guard let callerInfo = callerInfo else {
                 print("Error fetching caller info")
@@ -685,62 +687,19 @@ class UserData: ObservableObject {
 
 
 
-//    public func UpdateCallAPI() {
-////        fetchCallerInfo { callerInfo in
-////            guard let deviceToken = callerInfo?.deviceToken else {
-////                print("No device token found")
-////                return
-////            }
-//        
-//        fetchCalleeInfo(callerID: otherUserIDUPdate) { calleeInfo in
-//             guard let deviceToken = calleeInfo?.deviceToken else {
-//                 print("No device token found")
-//                 return
-//             }
-//
-//            guard let url = URL(string: "http://172.20.10.3:3000/update-call") else {
-//                print("Invalid URL")
+    public func UpdateCallAPI() {
+//        fetchCallerInfo { callerInfo in
+//            guard let deviceToken = callerInfo?.deviceToken else {
+//                print("No device token found")
 //                return
 //            }
-//
-//            var request = URLRequest(url: url)
-//            request.httpMethod = "POST"
-//            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//
-//            let callerInfoDict = [
-//                "id": calleeInfo?.id ?? "",
-//                "name": calleeInfo?.name ?? "",
-//                "callerID": calleeInfo?.callerID ?? "",
-//                "deviceToken": calleeInfo?.deviceToken
-//            ]
-//
-//            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": "someType"]
-//            do {
-//                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-//            } catch {
-//                print("Error encoding request body: \(error)")
-//                return
-//            }
-//
-//            URLSession.shared.dataTask(with: request) { data, response, error in
-//                if let error = error {
-//                    print("API call error: \(error)")
-//                    return
-//                }
-//
-//                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-//                    print("Invalid response")
-//                    return
-//                }
-//
-//                if let data = data {
-//                    print("Response data: \(String(data: data, encoding: .utf8) ?? "")")
-//                }
-//            }.resume()
-//        }
-//    }
+        
+        fetchCalleeInfo(callerID: otherUserIDUPdate) { calleeInfo in
+             guard let deviceToken = calleeInfo?.deviceToken else {
+                 print("No device token found")
+                 return
+             }
 
-    public func UpdateCallAPI(with callInfo: CallInfoUpdateAPI) {
             guard let url = URL(string: "http://172.20.10.3:3000/update-call") else {
                 print("Invalid URL")
                 return
@@ -750,18 +709,16 @@ class UserData: ObservableObject {
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-            let requestBody: [String: Any] = [
-                "callerInfo": [
-                    "id": callInfo.id,
-                    "name": callInfo.name,
-                    "callerID": callInfo.callerID,
-                    "deviceToken": callInfo.deviceToken
-                ],
-                "type": "someType" // Replace "someType" with the actual type value if needed
+            let callerInfoDict = [
+                "id": calleeInfo?.id ?? "",
+                "name": calleeInfo?.name ?? "",
+                "callerID": calleeInfo?.callerID ?? "",
+                "deviceToken": calleeInfo?.deviceToken
             ]
 
+            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": "someType"]
             do {
-                request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
             } catch {
                 print("Error encoding request body: \(error)")
                 return
@@ -779,23 +736,68 @@ class UserData: ObservableObject {
                 }
 
                 if let data = data {
-                    print("in here")
                     print("Response data: \(String(data: data, encoding: .utf8) ?? "")")
                 }
             }.resume()
         }
-       
-       func updateCallInfo() {
-           fetchCallerInfo { [weak self] callerInfo in
-               guard let self = self, let callerInfo = callerInfo else {
-                   print("Caller info is nil")
-                   return
-               }
-               
-               let callInfo = CallInfoUpdateAPI(id: callerInfo.id, name: callerInfo.name, callerID: callerInfo.callerID, deviceToken: callerInfo.deviceToken)
-               self.UpdateCallAPI(with: callInfo)
-           }
-       }
+    }
+
+//    public func UpdateCallAPI(with callInfo: CallInfoUpdateAPI) {
+//            guard let url = URL(string: "http://172.20.10.3:3000/update-call") else {
+//                print("Invalid URL")
+//                return
+//            }
+//
+//            var request = URLRequest(url: url)
+//            request.httpMethod = "POST"
+//            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+//
+//            let requestBody: [String: Any] = [
+//                "callerInfo": [
+//                    "id": callInfo.id,
+//                    "name": callInfo.name,
+//                    "callerID": callInfo.callerID,
+//                    "deviceToken": callInfo.deviceToken
+//                ],
+//                "type": "someType" // Replace "someType" with the actual type value if needed
+//            ]
+//
+//            do {
+//                request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+//            } catch {
+//                print("Error encoding request body: \(error)")
+//                return
+//            }
+//
+//            URLSession.shared.dataTask(with: request) { data, response, error in
+//                if let error = error {
+//                    print("API call error: \(error)")
+//                    return
+//                }
+//
+//                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+//                    print("Invalid response")
+//                    return
+//                }
+//
+//                if let data = data {
+//                    print("in here")
+//                    print("Response data: \(String(data: data, encoding: .utf8) ?? "")")
+//                }
+//            }.resume()
+//        }
+//       
+//       func updateCallInfo() {
+//           fetchCallerInfo { [weak self] callerInfo in
+//               guard let self = self, let callerInfo = callerInfo else {
+//                   print("Caller info is nil")
+//                   return
+//               }
+//               
+//               let callInfo = CallInfoUpdateAPI(id: callerInfo.id, name: callerInfo.name, callerID: callerInfo.callerID, deviceToken: callerInfo.deviceToken)
+//               self.UpdateCallAPI(with: callInfo)
+//           }
+//       }
     
 
    
@@ -866,6 +868,36 @@ class UserData: ObservableObject {
                }
            }
        }
+    
+    
+    func generateFCMToken(completion: @escaping (String?) -> Void) {
+        guard let deviceToken = DeviceTokenManager.shared.deviceToken else {
+            print("Device token not available. Cannot generate FCM token.")
+            completion(nil)
+            return
+        }
+
+        // Set the APNs token for Messaging
+        Messaging.messaging().apnsToken = deviceToken.data(using: .utf8)
+
+        // Now generate the FCM token
+        Messaging.messaging().token { token, error in
+            if let error = error {
+                print("Error fetching FCM token: \(error)")
+                completion(nil)
+            } else if let token = token {
+                print("FCM token generated: \(token)")
+                UserDefaults.standard.set(token, forKey: "fcmToken")
+                completion(token)
+            } else {
+                print("FCM token is nil")
+                completion(nil)
+            }
+        }
+    }
+
+
+    
     
     
 }
