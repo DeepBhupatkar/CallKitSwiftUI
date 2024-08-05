@@ -2,8 +2,9 @@
 //  CallingView.swift
 //  CallKitSwiftUI
 //
-//  Created by Deep Bhupatkar on 01/08/24.
+//  Created by Deep Bhupatkar on 30/07/24.
 //
+
 import SwiftUI
 
 struct CallingView: View {
@@ -11,6 +12,7 @@ struct CallingView: View {
     var userName: String
 
     @State private var isNavigating = false
+    @ObservedObject var notificationManager = NotificationManager.shared
 
     var body: some View {
         ZStack {
@@ -43,11 +45,7 @@ struct CallingView: View {
                 Spacer()
 
                 Button(action: {
-                    if let callUUID = UUID(uuidString: userNumber) {
-                        CallManager.shared.endCall(callUUID: callUUID)
-                    } else {
-                        print("Invalid callUUID \(userNumber)")
-                    }
+                 
                 }) {
                     Image(systemName: "phone.down.fill")
                         .font(.system(size: 24))
@@ -60,18 +58,11 @@ struct CallingView: View {
             }
             .padding(.horizontal, 30)
         }
-        .onAppear {
-            // Delay navigation to CallView by 10-15 seconds
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 20) {
-//                isNavigating = true
-//            }
-        }
+        /// Navigation View After Receiving the FCM notification.
         .background(
-            NavigationLink(destination: CallView(callerName: userName, callerNumber: userNumber), isActive: $isNavigating) {
+            NavigationLink(destination: MeetingView(), isActive: $notificationManager.shouldNavigate) {
                 EmptyView()
             }
         )
     }
 }
-
-

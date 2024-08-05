@@ -12,5 +12,5 @@ struct User: Identifiable {
     let name: String
     let callerID: String
     let deviceToken : String
-
+    let fcmToken : String
 }

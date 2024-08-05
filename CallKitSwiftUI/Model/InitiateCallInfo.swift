@@ -13,6 +13,7 @@ struct CallerInfo: Codable {
     let name: String
     let callerID: String
     let deviceToken : String
+    let fcmToken : String
 
 }
 
@@ -22,6 +23,7 @@ struct CalleeInfo: Codable {
     let name: String
     let callerID: String
     let deviceToken : String
+    let fcmToken : String
 
 }
 //Meeting Info Can Be Static
@@ -34,7 +36,6 @@ struct VideoSDKInfo: Codable {
 }
 
 
-
 struct CallRequest: Codable {
     let callerInfo: CallerInfo
     let calleeInfo: CalleeInfo
@@ -42,20 +43,4 @@ struct CallRequest: Codable {
 }
 
 
-struct CallInfoUpdateAPI : Codable
-{
-    let id: String
-    let name: String
-    let callerID: String
-    let deviceToken : String
-}
-
-
-struct CallIeeenfoUpdateAPI : Codable
-{
-    let id: String
-    let name: String
-    let callerID: String
-    let deviceToken : String
-}
 

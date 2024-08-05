@@ -16,11 +16,13 @@ struct MeetingView: View{
     // instance of MeetingViewController which we will implement in next step
     @ObservedObject var meetingViewController = MeetingViewController()
     // Variables for keeping the state of various controls
-     @State var meetingId: String?
-     @State var userName: String?
+     @State var meetingId: String? = "00kq-7nyo-1e49"
+     @State var userName: String? = "Demo"
      @State var isUnMute: Bool = true
      @State var camEnabled: Bool = true
      @State var isScreenShare: Bool = false
+    
+    var userData = UserData()
 
     var body: some View {
 
@@ -131,7 +133,13 @@ struct MeetingView: View{
                     }
                 }
             }
-        }.onAppear() {
+        }.onAppear()
+        
+        
+                // Call the API when the view appears
+                
+        {
+            userData.UpdateCallAPI()
             /// MARK :- configuring the videoSDK
             VideoSDK.config(token: meetingViewController.token)
             if meetingId?.isEmpty == false {

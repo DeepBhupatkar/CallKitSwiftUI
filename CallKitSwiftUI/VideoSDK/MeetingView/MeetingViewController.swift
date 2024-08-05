@@ -11,7 +11,7 @@ import WebRTC
 
 class MeetingViewController: ObservableObject {
 
-    var token = "Your_Token"
+    var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJkYWUzNjU0Ny01Y2Y1LTQ1MGItYTE1My1hYzhhNDcyYjc3NzkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcyMTEyNzYxMCwiZXhwIjoxNzIzNzE5NjEwfQ.mr1iOtcRF9Ofjm1kSN5jq8PNd6xoZ0tmOtdZlovZBis"
     var meetingId: String = ""
     var name: String = ""
 
@@ -23,8 +23,8 @@ class MeetingViewController: ObservableObject {
 
     func initializeMeeting(meetingId: String, userName: String) {
         meeting = VideoSDK.initMeeting(
-            meetingId: meetingId,
-            participantName: userName,
+            meetingId: "00kq-7nyo-1e49",
+            participantName: "iPhone",
             micEnabled: true,
             webcamEnabled: true
         )
@@ -65,6 +65,7 @@ extension MeetingViewController: MeetingEventListener {
 
     func onMeetingLeft() {
 
+        print("HEre")
         meeting?.localParticipant.removeEventListener(self)
         meeting?.removeEventListener(self)
     }

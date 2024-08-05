@@ -30,16 +30,11 @@ struct CallKitSwiftUIApp: App {
     // Link AppDelegate to the SwiftUI lifecycle
     @StateObject private var userData = UserData()
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-//    init() {
-//          FirebaseApp.configure()
-//      }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-//                .onAppear {
-//                                    // Trigger initiateCall based on some condition or event
-//                                    userData.initiateCall(otherUserID: "21203")
-//                                }
+
         }
     }
 }
