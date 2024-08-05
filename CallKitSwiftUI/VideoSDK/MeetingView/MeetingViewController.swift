@@ -11,7 +11,7 @@ import WebRTC
 
 class MeetingViewController: ObservableObject {
 
-    var token = "Your_Token"
+    var token = ""
     var meetingId: String = ""
     var name: String = ""
 
@@ -23,8 +23,8 @@ class MeetingViewController: ObservableObject {
 
     func initializeMeeting(meetingId: String, userName: String) {
         meeting = VideoSDK.initMeeting(
-            meetingId: meetingId,
-            participantName: userName,
+            meetingId: "00kq-7nyo-1e49",
+            participantName: "iPhone",
             micEnabled: true,
             webcamEnabled: true
         )

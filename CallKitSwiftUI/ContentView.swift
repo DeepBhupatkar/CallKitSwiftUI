@@ -608,7 +608,7 @@ struct ContentView: View {
                
                 
                 
-                NavigationLink(destination: CallView(callerName: callerName, callerNumber: callerNumber), isActive: $isCallViewActive) {
+                NavigationLink(destination: MeetingView(), isActive: $isCallViewActive) {
                     EmptyView()
                 }
 

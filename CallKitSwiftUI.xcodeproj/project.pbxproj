@@ -26,6 +26,7 @@
 		2C6F86D32C58F46A00A2527E /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 2C6F86D22C58F46A00A2527E /* FirebaseStorage */; };
 		2C6F86D72C58FF4E00A2527E /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6F86D62C58FF4E00A2527E /* User.swift */; };
 		2C6F86D92C58FF6C00A2527E /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6F86D82C58FF6C00A2527E /* UserData.swift */; };
+		2C7E593D2C609C3A00BB925E /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C7E593C2C609C3A00BB925E /* NotificationManager.swift */; };
 		2CA541A22C5B43A800F2A877 /* CallingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA541A12C5B43A800F2A877 /* CallingView.swift */; };
 		2CA541A42C5B491600F2A877 /* CallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CA541A32C5B491600F2A877 /* CallManager.swift */; };
 		2CC125592C59042E0086E6FF /* RegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CC125582C59042E0086E6FF /* RegistrationView.swift */; };
@@ -49,6 +50,7 @@
 		2C6F86C52C58F26D00A2527E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		2C6F86D62C58FF4E00A2527E /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		2C6F86D82C58FF6C00A2527E /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
+		2C7E593C2C609C3A00BB925E /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		2CA541A12C5B43A800F2A877 /* CallingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallingView.swift; sourceTree = "<group>"; };
 		2CA541A32C5B491600F2A877 /* CallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallManager.swift; sourceTree = "<group>"; };
 		2CC125582C59042E0086E6FF /* RegistrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationView.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				2CD331082C5A68CE008B7736 /* NotificationNameExtension.swift */,
 				2CA541A12C5B43A800F2A877 /* CallingView.swift */,
 				2CA541A32C5B491600F2A877 /* CallManager.swift */,
+				2C7E593C2C609C3A00BB925E /* NotificationManager.swift */,
 			);
 			path = CallKitSwiftUI;
 			sourceTree = "<group>";
@@ -234,6 +237,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CD331092C5A68CE008B7736 /* NotificationNameExtension.swift in Sources */,
+				2C7E593D2C609C3A00BB925E /* NotificationManager.swift in Sources */,
 				2CD096E52C5A118700391D2E /* InitiateCall.swift in Sources */,
 				2C4C11232C5C9A2D000F0D1B /* MeetingView.swift in Sources */,
 				2C6F86D72C58FF4E00A2527E /* User.swift in Sources */,

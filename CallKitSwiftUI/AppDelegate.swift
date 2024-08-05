@@ -721,6 +721,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     private var captureSession: AVCaptureSession?
     private var previewLayer: AVCaptureVideoPreviewLayer?
+    
+    
+  
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -928,7 +931,7 @@ extension AppDelegate {
         if let messageID = userInfo["gcm.message_id"] {
             print("Message ID: \(messageID)")
         }
-        
+        handleNotification(notification: notification)
         completionHandler([.alert, .badge, .sound])
     }
 
@@ -940,8 +943,16 @@ extension AppDelegate {
             print("Message ID: \(messageID)")
         }
         
+        handleNotification(notification: response.notification)
         completionHandler()
     }
+    
+    private func handleNotification(notification: UNNotification) {
+           // Update the shared notification manager
+        NotificationManager.shared.handleNotification(notification: notification)
+
+       }
+    
 }
 
 // MARK: - PKPushRegistryDelegate
@@ -1019,6 +1030,8 @@ extension AppDelegate: CXProviderDelegate {
 }
 
 
+//MARK: DeviceTokenManger
+
 class DeviceTokenManager {
     static let shared = DeviceTokenManager()
     private init() {}
@@ -1026,6 +1039,8 @@ class DeviceTokenManager {
     var deviceToken: String?
 }
 
+
+//MARK: FCMTokenManger
 
 class FCMTokenManager{
     
