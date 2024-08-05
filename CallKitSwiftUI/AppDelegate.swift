@@ -425,12 +425,7 @@
 //    
 //    
 //
-class DeviceTokenManager {
-    static let shared = DeviceTokenManager()
-    private init() {}
 
-    var deviceToken: String?
-}
 //
 //
 //import UIKit
@@ -870,6 +865,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("FCM registration token: \(String(describing: fcmToken))")
         
+//        DeviceTokenManager.shared.deviceToken = deviceToken
+        
+        FCMTokenManager.sharedFCM.FCMTokenOfDevice = fcmToken
+        
         let dataDict: [String: String] = ["token": fcmToken ?? ""]
         NotificationCenter.default.post(
             name: Notification.Name("FCMToken"),
@@ -996,12 +995,16 @@ extension AppDelegate: CXProviderDelegate {
     func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
         configureAudioSession()
         startCapturingVideo()
+        NotificationCenter.default.post(name: .callAnswered, object: nil)
+        NotificationCenter.default.post(name: .callAccepted, object: nil)
         action.fulfill()
     }
     
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         configureAudioSession()
         startCapturingVideo()
+        NotificationCenter.default.post(name: .callAnswered, object: nil)
+        NotificationCenter.default.post(name: .callAccepted, object: nil)
         action.fulfill()
     }
     
@@ -1013,4 +1016,21 @@ extension AppDelegate: CXProviderDelegate {
     func providerDidReset(_ provider: CXProvider) {
         stopCapturingVideo()
     }
+}
+
+
+class DeviceTokenManager {
+    static let shared = DeviceTokenManager()
+    private init() {}
+
+    var deviceToken: String?
+}
+
+
+class FCMTokenManager{
+    
+    static let sharedFCM = FCMTokenManager()
+    private init() {}
+    
+    var FCMTokenOfDevice: String?
 }

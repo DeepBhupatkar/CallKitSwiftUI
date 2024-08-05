@@ -181,7 +181,7 @@ struct CallView: View {
       .padding(.top, 30) // Padding from top
     }
     .onAppear {
-        userData.UpdateCallAPI()  // Call the API when the view appears
+        userData.updateCallInfo() // Call the API when the view appears
          }
   }
 }
