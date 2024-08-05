@@ -16,7 +16,7 @@ class NotificationManager: ObservableObject {
     private init() {}
     
     func handleNotification(notification: UNNotification) {
-        // Handle the notification payload here
+        
         // Update the state to navigate to a new screen
         DispatchQueue.main.async {
             self.shouldNavigate = true

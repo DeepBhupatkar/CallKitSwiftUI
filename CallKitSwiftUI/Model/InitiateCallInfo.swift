@@ -36,7 +36,6 @@ struct VideoSDKInfo: Codable {
 }
 
 
-
 struct CallRequest: Codable {
     let callerInfo: CallerInfo
     let calleeInfo: CalleeInfo
@@ -44,22 +43,4 @@ struct CallRequest: Codable {
 }
 
 
-struct CallInfoUpdateAPI : Codable
-{
-    let id: String
-    let name: String
-    let callerID: String
-    let deviceToken : String
-    let fcmToken : String
-}
-
-
-struct CallIeeenfoUpdateAPI : Codable
-{
-    let id: String
-    let name: String
-    let callerID: String
-    let deviceToken : String
-    let fcmToken : String
-}
 
