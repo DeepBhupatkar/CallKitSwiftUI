@@ -23,3 +23,8 @@ class NotificationManager: ObservableObject {
         }
     }
 }
+
+extension Notification.Name {
+    static let callingStarted = Notification.Name("callingStarted")
+    static let callAnswered = Notification.Name("callAnswered")
+}

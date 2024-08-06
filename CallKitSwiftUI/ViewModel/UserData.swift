@@ -8,50 +8,19 @@
 import SwiftUI
 import Firebase
 import FirebaseFirestore
-
 import FirebaseMessaging
 
 
 class UserData: ObservableObject {
     @Published var users: [User] = []
-    @Published var newName = ""
-    @Published var isEditActive = false
-    @Published var selectedUser: User? = nil // Track selected user for editing
     @Published var callerID: String = "" // Store the caller ID
-    @Published public var otherUserID: String = "" //Store OtherUserID (Which Enter By User To make call to otherUser)
-    
-    
-    
-    
-    
+    @Published public var otherUserID: String = ""
+    static let shared = UserData()
     private let callerIDKey = "callerIDKey" // Key for UserDefaults
-    
-    init() {
-        fetchData()
-    }
-    
+
     func generateUniqueCallerID() -> String {
         let randomNumber = Int.random(in: 10000...99999)
         return String(randomNumber)
-    }
-    
-    func addData() {
-        let callerID = generateUniqueCallerID()
-        Firestore.firestore().collection("users").addDocument(data: [
-            "name": newName,
-            "callerID": callerID,
-            "deviceToken": DeviceTokenManager.shared.deviceToken ?? "null",
-            "fcmToken" : FCMTokenManager.sharedFCM.FCMTokenOfDevice
-        ]) { [weak self] error in
-            if let error = error {
-                print("Error adding document: \(error.localizedDescription)")
-            } else {
-                print("Document added successfully")
-                self?.storeCallerID(callerID) // Store the caller ID locally
-                self?.fetchData()
-                self?.newName = "" // Clear input field after adding
-            }
-        }
     }
     
     func registerUser(name: String, completion: @escaping (Bool) -> Void) {
@@ -68,61 +37,9 @@ class UserData: ObservableObject {
             } else {
                 print("Document added successfully")
                 self?.storeCallerID(callerID) // Store the caller ID locally
-                self?.fetchData()
                 completion(true)
             }
         }
-    }
-    
-    func fetchData() {
-        Firestore.firestore().collection("users").getDocuments { [weak self] snapshot, error in
-            if let error = error {
-                print("Error fetching documents: \(error.localizedDescription)")
-            } else {
-                if let snapshot = snapshot {
-                    self?.users = snapshot.documents.map { doc in
-                        let data = doc.data()
-                        let name = data["name"] as? String ?? ""
-                        let callerID = data["callerID"] as? String ?? ""
-                        let deviceToken = data["deviceToken"] as? String ?? ""
-                        let fcmToken = data["fcmToken"] as? String ?? ""
-                        return User(id: doc.documentID, name: name, callerID: callerID, deviceToken: deviceToken,fcmToken: fcmToken)
-                    }
-                }
-            }
-        }
-    }
-    
-    func updateData() {
-        guard let selectedUser = selectedUser else { return }
-        Firestore.firestore().collection("users").document(selectedUser.id).updateData(["name": newName]) { [weak self] error in
-            if let error = error {
-                print("Error updating document: \(error.localizedDescription)")
-            } else {
-                print("Document updated successfully")
-                self?.fetchData()
-                self?.newName = ""
-                self?.isEditActive.toggle() // Toggle edit mode after update
-                self?.selectedUser = nil // Deselect user after update
-            }
-        }
-    }
-    
-    func deleteData(user: User) {
-        Firestore.firestore().collection("users").document(user.id).delete() { [weak self] error in
-            if let error = error {
-                print("Error deleting document: \(error.localizedDescription)")
-            } else {
-                print("Document deleted successfully")
-                self?.fetchData() // Refetch data after deletion
-            }
-        }
-    }
-    
-    func editData(user: User) {
-        newName = user.name // Set the new name field to the current user's name
-        isEditActive = true // Activate edit mode
-        selectedUser = user // Store the selected user for updating
     }
     
     func fetchCallerID() -> String? {
@@ -135,79 +52,6 @@ class UserData: ObservableObject {
         UserDefaults.standard.set(callerID, forKey: callerIDKey)
     }
     
-    // MARK: Fetching Data
-    
-    func fetchDataBasedOnCallerID() {
-        // Get callerID from UserDefaults
-        guard let callerIDDevice = fetchCallerID() else {
-            print("Caller ID not found in UserDefaults")
-            return
-        }
-        
-        // Fetch data from Firestore using callerID
-        Firestore.firestore().collection("users").document(callerIDDevice).getDocument { [weak self] document, error in
-            if let error = error {
-                print("Error fetching document: \(error.localizedDescription)")
-            } else {
-                if let document = document, document.exists {
-                    let data = document.data()
-                    let name = data?["name"] as? String ?? ""
-                    let deviceToken = data?["deviceToken"] as? String ?? ""
-                    let callerID = data?["callerID"] as? String ?? ""
-                    let fcmToken = data?["fcmToken"] as? String ?? ""
-                    
-                    
-                    // Create User instance with fetched data
-                    let user = User(id: callerID, name: name, callerID: callerID, deviceToken: deviceToken, fcmToken: fcmToken)
-                    self?.selectedUser = user
-                } else {
-                    print("Document does not exist")
-                }
-            }
-        }
-    }
-    
-    
-    // MARK: For verifying the CallerID of other user which is Enter By user
-    
-    func verifyCallerID(_ otherUserID: String, completion: @escaping (User?) -> Void) {
-        
-        OtherUserIDManager.SharedOtherUID.OtherUIDOf = otherUserID
-        
-        
-        
-        Firestore.firestore().collection("users")
-            .whereField("callerID", isEqualTo: otherUserID)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error verifying caller ID: \(error.localizedDescription)")
-                    completion(nil)
-                } else {
-                    if let snapshot = snapshot, !snapshot.isEmpty {
-                        // Assuming callerID is unique, we take the first document
-                        if let document = snapshot.documents.first {
-                            let data = document.data()
-                            let name = data["name"] as? String ?? ""
-                            let deviceToken = data["deviceToken"] as? String ?? ""
-                            let callerID = data["callerID"] as? String ?? ""
-                            let fcmToken = data["fcmToken"] as? String ?? ""
-                            
-                            let user = User(id: document.documentID, name: name, callerID: callerID, deviceToken: deviceToken,fcmToken: fcmToken)
-                            completion(user)
-                            print("The CAllerID is matched for this \(otherUserID)")
-                        } else {
-                            print("No document found with the given caller ID")
-                            completion(nil)
-                        }
-                    } else {
-                        print("Verfiy No documents found for the given caller ID")
-                        completion(nil)
-                    }
-                }
-            }
-    }
-    
-    
     func fetchCallerInfo(completion: @escaping (CallerInfo?) -> Void) {
         // Get callerID from UserDefaults
         guard let callerIDDevice = UserDefaults.standard.string(forKey: callerIDKey) else {
@@ -215,9 +59,7 @@ class UserData: ObservableObject {
             completion(nil)
             return
         }
-        
         print("Retrieved Caller ID from UserDefaults: \(callerIDDevice)")
-        
         // Fetch data from Firestore using the callerID field
         Firestore.firestore().collection("users")
             .whereField("callerID", isEqualTo: callerIDDevice)
@@ -263,7 +105,6 @@ class UserData: ObservableObject {
                     completion(nil)
                 } else {
                     if let snapshot = snapshot, !snapshot.isEmpty {
-                        // Assuming callerID is unique, we take the first document
                         if let document = snapshot.documents.first {
                             let data = document.data()
                             let name = data["name"] as? String ?? ""
@@ -305,8 +146,7 @@ class UserData: ObservableObject {
                     return
                 }
                 
-                // Use callerInfo and calleeInfo as needed
-                let videoSDKInfo = VideoSDKInfo() // Initialize as needed
+                let videoSDKInfo = VideoSDKInfo()
                 completion(callerInfo, calleeInfo, videoSDKInfo)
                 
                 // Create a CallRequest
@@ -417,6 +257,29 @@ class UserData: ObservableObject {
     
 }
 
+
+
+
+/// MARK: Singleton Class For Device,FMC Token Store and For OtherUserID
+
+//MARK: DeviceTokenManager
+
+class DeviceTokenManager {
+    static let shared = DeviceTokenManager()
+    private init() {}
+
+    var deviceToken: String?
+}
+//MARK: FCMTokenManager
+
+class FCMTokenManager{
+    
+    static let sharedFCM = FCMTokenManager()
+    private init() {}
+    
+    var FCMTokenOfDevice: String?
+}
+
 //MARK: OtherUserManager
 
 class OtherUserIDManager{
@@ -426,5 +289,3 @@ class OtherUserIDManager{
     
     var OtherUIDOf: String?
 }
-
-
