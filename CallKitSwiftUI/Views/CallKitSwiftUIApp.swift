@@ -5,22 +5,6 @@
 //  Created by Deep Bhupatkar on 30/07/24.
 //
 
-//import SwiftUI
-//import Firebase
-//
-//@main
-//struct CallKitSwiftUIApp: App {
-//    init() {
-//        FirebaseApp.configure()
-//    }
-//
-//    var body: some Scene {
-//        WindowGroup {
-//            ContentView()
-//        }
-//    }
-//}
-
 import SwiftUI
 
 import FirebaseCore
@@ -33,7 +17,7 @@ struct CallKitSwiftUIApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            JoinView()
 
         }
     }

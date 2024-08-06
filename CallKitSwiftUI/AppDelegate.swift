@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private var previewLayer: AVCaptureVideoPreviewLayer?
     
     // Store caller IDs
-      var callerIDs: [UUID: String] = [:]
+    var callerIDs: [UUID: String] = [:]
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -43,9 +43,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
         self.requestMicrophonePermission()
         NotificationCenter.default.addObserver(self, selector: #selector(handleInterruption), name: AVAudioSession.interruptionNotification, object: nil)
-        
+           checkAndRegisterUser()
         return true
     }
+    
+    // MARK: - Registering Device And Pushing
+        private func registerUserIfNeeded() {
+            if !UserDefaults.standard.bool(forKey: "isUserRegistered") {
+                let name = UIDevice.current.name
+                UserData.shared.registerUser(name: name) { success in
+                    if success {
+                        UserDefaults.standard.set(true, forKey: "isUserRegistered")
+                    }
+                }
+            }
+        }
+    
+    // MARK : - calling registerUserIfNeeded()
+    private func checkAndRegisterUser() {
+          Timer.scheduledTimer(withTimeInterval: 12.0, repeats: false) { [weak self] timer in
+              self?.registerUserIfNeeded()
+          }
+      }
+    
     
     // MARK: - Handle Incoming Calls with CallKit
     func reportIncomingCall(callerName: String) {
@@ -101,42 +121,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             fatalError("Unknown interruption type")
         }
     }
-    
-    // MARK: - Video Management
-    func startCapturingVideo() {
-        guard captureSession == nil else { return }
-
-        captureSession = AVCaptureSession()
-        captureSession?.sessionPreset = .high
-
-        guard let camera = AVCaptureDevice.default(for: .video) else {
-            print("No camera available")
-            return
-        }
-        let input = try? AVCaptureDeviceInput(device: camera)
-        if let input = input, captureSession?.canAddInput(input) == true {
-            captureSession?.addInput(input)
-        } else {
-            print("Failed to add camera input")
-            return
-        }
-
-        let output = AVCaptureVideoDataOutput()
-        if captureSession?.canAddOutput(output) == true {
-            captureSession?.addOutput(output)
-        } else {
-            print("Failed to add video output")
-            return
-        }
-
-        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession!)
-        previewLayer.videoGravity = .resizeAspectFill
-        self.previewLayer = previewLayer
-
-        DispatchQueue.global(qos: .userInitiated).async {
-            self.captureSession?.startRunning()
-        }
-    }
 
     func stopCapturingVideo() {
         captureSession?.stopRunning()
@@ -175,7 +159,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Messaging.messaging().apnsToken = deviceToken
-    }
+        }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Failed to register for remote notifications: \(error)")
@@ -184,9 +168,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     // MARK: - Messaging Delegate Methods
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("FCM registration token: \(String(describing: fcmToken))")
-        
-//        DeviceTokenManager.shared.deviceToken = deviceToken
-        
         FCMTokenManager.sharedFCM.FCMTokenOfDevice = fcmToken
         
         let dataDict: [String: String] = ["token": fcmToken ?? ""]
@@ -200,19 +181,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             UserDefaults.standard.set(token, forKey: "fcmToken")
         }
     }
-    
-    // Handle incoming calls with CallKit
-    func reportIncomingCall() {
-        let callUpdate = CXCallUpdate()
-        callUpdate.remoteHandle = CXHandle(type: .phoneNumber, value: "Caller")
-        
-        self.callProvider.reportNewIncomingCall(with: UUID(), update: callUpdate) { error in
-            if let error = error {
-                print("Error reporting incoming call: \(error)")
-            }
-        }
-    }
-    
     // MARK: - UISceneSession Lifecycle
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
@@ -302,7 +270,6 @@ extension AppDelegate: PKPushRegistryDelegate {
         print("Extracted caller ID: \(callerID)")
         print("Stored callerID in OtherUserIDManager: \(OtherUserIDManager.SharedOtherUID.OtherUIDOf ?? "Not set")")
         
-        // You can also extract other information if needed
         let videoSDKInfo = payloadDict["videoSDKInfo"] as? [String: Any]
         
         if UIApplication.shared.applicationState == .active {
@@ -339,31 +306,19 @@ extension AppDelegate: CXProviderDelegate {
     
     func provider(_ provider: CXProvider, perform action: CXStartCallAction) {
         configureAudioSession()
-        startCapturingVideo()
-        
-        // If this is an outgoing call, you might want to update the call here
         let update = CXCallUpdate()
         update.remoteHandle = action.handle
         update.localizedCallerName = action.handle.value
         provider.reportCall(with: action.callUUID, updated: update)
-        
-        NotificationCenter.default.post(name: .callAnswered, object: nil)
-        NotificationCenter.default.post(name: .callAccepted, object: nil)
         action.fulfill()
     }
     
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         configureAudioSession()
-        startCapturingVideo()
-        
         if let callerID = callerIDs[action.callUUID] {
-            // Use the caller ID to establish the connection
             print("Establishing call connection with caller ID: \(callerID)")
-            // Implement your call connection logic here
         }
-        
         NotificationCenter.default.post(name: .callAnswered, object: nil)
-        NotificationCenter.default.post(name: .callAccepted, object: nil)
         action.fulfill()
     }
     
@@ -371,34 +326,12 @@ extension AppDelegate: CXProviderDelegate {
         stopCapturingVideo()
         callerIDs.removeValue(forKey: action.callUUID)
         let meetingViewController = MeetingViewController()
-        meetingViewController.meeting?.leave()
+        meetingViewController.onMeetingLeft()
         action.fulfill()
     }
     
     func providerDidReset(_ provider: CXProvider) {
         stopCapturingVideo()
-      
         callerIDs.removeAll()
     }
-}
-
-
-//MARK: DeviceTokenManger
-
-class DeviceTokenManager {
-    static let shared = DeviceTokenManager()
-    private init() {}
-
-    var deviceToken: String?
-}
-
-
-//MARK: FCMTokenManger
-
-class FCMTokenManager{
-    
-    static let sharedFCM = FCMTokenManager()
-    private init() {}
-    
-    var FCMTokenOfDevice: String?
 }
