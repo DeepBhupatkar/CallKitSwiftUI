@@ -134,10 +134,6 @@ struct MeetingView: View{
                 }
             }
         }.onAppear()
-        
-        
-                // Call the API when the view appears
-                
         {
             userData.UpdateCallAPI()
             /// MARK :- configuring the videoSDK
@@ -193,7 +189,6 @@ struct ParticipantView: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: VideoView, context: Context) {
-        print("ui updated")
         if track != nil {
             track?.add(uiView.videoView)
         } else {
@@ -201,7 +196,3 @@ struct ParticipantView: UIViewRepresentable {
         }
     }
 }
-
-//#Preview {
-//    MeetingView(presentationMode: false, meetingViewController: true, meetingId: "1231", userName: "HELLO", isUnMute: false, camEnabled: false, isScreenShare: false)
-//}

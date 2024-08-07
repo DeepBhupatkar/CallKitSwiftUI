@@ -10,14 +10,13 @@ import Firebase
 import FirebaseFirestore
 
 struct JoinView: View {
-    @StateObject private var userData = UserData() // Fetch user data
-    @State public var otherUserID: String = "" // Use this to set the ID to verify
-    @State private var isCallViewActive: Bool = false // REMOVE
-    @State private var isLoading: Bool = true // REMOVE
+    @StateObject private var userData = UserData() 
+    @State public var otherUserID: String = ""
+    @State private var isCallViewActive: Bool = false
+    @State private var isLoading: Bool = true
     @State private var isCallingViewActive: Bool = false
-    @State private var userName: String = "" // REMOVE
+    @State private var userName: String = ""
     @State private var userNumber: String = ""
-
     
     var body: some View {
         NavigationView {
@@ -83,8 +82,7 @@ struct JoinView: View {
                         // Pass the user's name and number to the calling view
                         self.userName = calleeInfo?.name ?? "null"
                         self.userNumber = calleeInfo?.callerID ?? "null"
-                                               
-                        
+
                     }
                 }) {
                     HStack {

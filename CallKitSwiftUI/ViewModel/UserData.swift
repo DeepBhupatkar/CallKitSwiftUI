@@ -18,10 +18,14 @@ class UserData: ObservableObject {
     static let shared = UserData()
     private let callerIDKey = "callerIDKey" // Key for UserDefaults
 
+    // MARK: Generating Unqiue CallerID
+    
     func generateUniqueCallerID() -> String {
         let randomNumber = Int.random(in: 10000...99999)
         return String(randomNumber)
     }
+    
+    // MARK: RegisterUser Method Which Will Be call from AppDelegate
     
     func registerUser(name: String, completion: @escaping (Bool) -> Void) {
         let callerID = generateUniqueCallerID()
@@ -42,15 +46,21 @@ class UserData: ObservableObject {
         }
     }
     
+    // MARK: Fetch CallerID From Defaults
+    
     func fetchCallerID() -> String? {
         // Retrieve the caller ID from UserDefaults
         return UserDefaults.standard.string(forKey: callerIDKey)
     }
     
+    // MARK: Store CallerID In Defaults
+    
     func storeCallerID(_ callerID: String) {
         // Save the caller ID to UserDefaults
         UserDefaults.standard.set(callerID, forKey: callerIDKey)
     }
+    
+    // MARK: FETCH CALLER INFO
     
     func fetchCallerInfo(completion: @escaping (CallerInfo?) -> Void) {
         // Get callerID from UserDefaults
@@ -128,7 +138,7 @@ class UserData: ObservableObject {
             }
     }
     
-    // MARK: InitiateCall
+    // MARK: InitiateCall Function
     
     func initiateCall(otherUserID: String, completion: @escaping (CallerInfo?, CalleeInfo?, VideoSDKInfo?) -> Void) {
         
@@ -165,11 +175,9 @@ class UserData: ObservableObject {
         }
     }
     
-    // MARK: API
+   /// MARK: APIs Calls
     
-    //http://192.168.22.132:3000/initiate-call
-    
-    /// API CALLING FOR INITIATE-CALL
+     //MARK:  API Calling For Initiate Call
     public func sendCallRequest(_ request: CallRequest, completion: @escaping (Result<Data?, Error>) -> Void) {
         guard let url = URL(string: "http://172.20.10.3:3000/initiate-call") else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
@@ -201,6 +209,8 @@ class UserData: ObservableObject {
     }
     
     
+    //MARK:  API Calling For Update Call
+
     public func UpdateCallAPI() {
         
         let storedCallerID = OtherUserIDManager.SharedOtherUID.OtherUIDOf

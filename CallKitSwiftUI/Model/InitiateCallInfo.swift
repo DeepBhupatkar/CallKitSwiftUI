@@ -35,6 +35,7 @@ struct VideoSDKInfo: Codable {
 
 }
 
+// It Combine all three and send the information to server.
 
 struct CallRequest: Codable {
     let callerInfo: CallerInfo
