@@ -19,10 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var callObserver: CXCallObserver!
     var callController: CXCallController!
     var callProvider: CXProvider!
-    
     private var captureSession: AVCaptureSession?
-    private var previewLayer: AVCaptureVideoPreviewLayer?
-    
     // Store caller IDs
     var callerIDs: [UUID: String] = [:]
 
@@ -30,20 +27,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         UIApplication.shared.applicationIconBadgeNumber = 0
         
+        // Configure Firebase for the app
         FirebaseApp.configure()
+        // Set the delegate for Firebase Messaging to handle FCM tokens
         Messaging.messaging().delegate = self
         
+        
+        // CallKit Objects For Oberserving, Monitoring & Controlling
         self.callObserver = CXCallObserver()
         self.callController = CXCallController()
-        self.callProvider = CXProvider(configuration: CXProviderConfiguration(localizedName: "In VideoSDK Callkit Demo"))
+        self.callProvider = CXProvider(configuration: CXProviderConfiguration(localizedName: "In CallKitSwiftUI"))
         self.callProvider.setDelegate(self, queue: nil)
         
+        // Register for push notifications
         self.registerForPushNotifications()
+        // Register for VoIP notifications
         self.voipRegistration()
     
+        // Request permission to use the microphone
         self.requestMicrophonePermission()
         NotificationCenter.default.addObserver(self, selector: #selector(handleInterruption), name: AVAudioSession.interruptionNotification, object: nil)
            checkAndRegisterUser()
+        
         return true
     }
     
@@ -59,7 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         }
     
-    // MARK : - calling registerUserIfNeeded()
+    // MARK: - calling registerUserIfNeeded()
     private func checkAndRegisterUser() {
           Timer.scheduledTimer(withTimeInterval: 12.0, repeats: false) { [weak self] timer in
               self?.registerUserIfNeeded()
@@ -122,12 +127,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
 
-    func stopCapturingVideo() {
-        captureSession?.stopRunning()
-        captureSession = nil
-        previewLayer?.removeFromSuperlayer()
-        previewLayer = nil
-    }
     
     // MARK: - VoIP Registration
     func voipRegistration() {
@@ -181,6 +180,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             UserDefaults.standard.set(token, forKey: "fcmToken")
         }
     }
+    
     // MARK: - UISceneSession Lifecycle
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
@@ -189,6 +189,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
     }
     
+    //MARK: Function For FCMToken Generation
     func generateFCMToken(completion: @escaping (String?) -> Void) {
         Messaging.messaging().token { token, error in
             if let error = error {
@@ -323,7 +324,6 @@ extension AppDelegate: CXProviderDelegate {
     }
     
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
-        stopCapturingVideo()
         callerIDs.removeValue(forKey: action.callUUID)
         let meetingViewController = MeetingViewController()
         meetingViewController.onMeetingLeft()
@@ -331,7 +331,6 @@ extension AppDelegate: CXProviderDelegate {
     }
     
     func providerDidReset(_ provider: CXProvider) {
-        stopCapturingVideo()
         callerIDs.removeAll()
     }
 }
