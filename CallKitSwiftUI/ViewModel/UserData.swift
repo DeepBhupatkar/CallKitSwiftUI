@@ -200,12 +200,8 @@ class UserData: ObservableObject {
                     switch result {
                     case .success(let roomID):
                         print("Meeting created successfully with Room ID: \(roomID)")
-                        
-//                        // Store the meeting ID if needed
-//                        MeetingManager.shared.currentMeetingID = roomID
-                        
-                        // Wait for 5 seconds before proceeding
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                       
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                             let videoSDKInfo = VideoSDKInfo()
 
                             // Proceed with the remaining code
@@ -272,10 +268,62 @@ class UserData: ObservableObject {
     
     //MARK:  API Calling For Update Call
 
-    public func UpdateCallAPI() {
-        
+//    public func UpdateCallAPI() {
+//        
+//        let storedCallerID = OtherUserIDManager.SharedOtherUID.OtherUIDOf
+//        
+//        fetchCalleeInfo(callerID: storedCallerID ?? "null") { calleeInfo in
+//            guard let calleeInfo = calleeInfo else {
+//                print("No callee info found")
+//                return
+//            }
+//            
+//            guard let url = URL(string: "http://172.20.10.3:3000/update-call") else {
+//                print("Invalid URL")
+//                return
+//            }
+//            
+//            var request = URLRequest(url: url)
+//            request.httpMethod = "POST"
+//            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+//            
+//            let callerInfoDict: [String: Any] = [
+//                "id": calleeInfo.id,
+//                "name": calleeInfo.name,
+//                "callerID": calleeInfo.callerID,
+//                "deviceToken": calleeInfo.deviceToken ?? "",
+//                "fcmToken": calleeInfo.fcmToken ?? ""
+//            ]
+//            
+//            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": "someType"]
+//            do {
+//                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+//            } catch {
+//                print("Error encoding request body: \(error)")
+//                return
+//            }
+//            
+//            URLSession.shared.dataTask(with: request) { data, response, error in
+//                if let error = error {
+//                    print("API call error: \(error)")
+//                    return
+//                }
+//                
+//                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+//                    print("Invalid response")
+//                    return
+//                }
+//                
+//                if let data = data {
+//                    print("Response data: \(String(data: data, encoding: .utf8) ?? "")")
+//                }
+//            }.resume()
+//        }
+//    }
+    
+    public func UpdateCallAPI(callType: String) {
         let storedCallerID = OtherUserIDManager.SharedOtherUID.OtherUIDOf
-        
+
         fetchCalleeInfo(callerID: storedCallerID ?? "null") { calleeInfo in
             guard let calleeInfo = calleeInfo else {
                 print("No callee info found")
@@ -299,7 +347,7 @@ class UserData: ObservableObject {
                 "fcmToken": calleeInfo.fcmToken ?? ""
             ]
             
-            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": "someType"]
+            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": callType]
             do {
                 request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
             } catch {
@@ -324,7 +372,7 @@ class UserData: ObservableObject {
             }.resume()
         }
     }
-    
+
     
    
     func createMeeting(token: String, completion: @escaping (Result<String, Error>) -> Void) {

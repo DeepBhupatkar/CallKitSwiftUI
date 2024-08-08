@@ -10,46 +10,46 @@ import VideoSDKRTC
 import WebRTC
 
 struct MeetingView: View{
-
+    
     @Environment(\.presentationMode) var presentationMode
-
+    
     // instance of MeetingViewController which we will implement in next step
     @ObservedObject var meetingViewController = MeetingViewController()
     // Variables for keeping the state of various controls
     
-     @State var meetingId: String?
-     @State var userName: String? = "Demo"
-     @State var isUnMute: Bool = true
-     @State var camEnabled: Bool = true
-     @State var isScreenShare: Bool = false
+    @State var meetingId: String?
+    @State var userName: String? = "Demo"
+    @State var isUnMute: Bool = true
+    @State var camEnabled: Bool = true
+    @State var isScreenShare: Bool = false
     
     var userData = UserData()
-
+    
     var body: some View {
-
+        
         VStack {
             if meetingViewController.participants.count == 0 {
                 Text("Meeting Initializing")
             } else {
                 VStack {
                     VStack(spacing: 20) {
-                        Text("Meeting ID: \(meetingViewController.meetingID)")
+                        Text("Meeting ID: \(MeetingManager.shared.currentMeetingID!)")
                             .padding(.vertical)
-
-                            List {
-                                ForEach(meetingViewController.participants.indices, id: \.self) { index in
-                                    Text("Participant Name: \(meetingViewController.participants[index].displayName)")
-                                    ZStack {
-                                        ParticipantView(track: meetingViewController.participants[index].streams.first(where: { $1.kind == .state(value: .video) })?.value.track as? RTCVideoTrack).frame(height: 250)
-                                        if meetingViewController.participants[index].streams.first(where: { $1.kind == .state(value: .video) }) == nil {
-                                            Color.white.opacity(1.0).frame(width: UIScreen.main.bounds.width, height: 250)
-                                            Text("No media")
-                                        }
+                        
+                        List {
+                            ForEach(meetingViewController.participants.indices, id: \.self) { index in
+                                Text("Participant Name: \(meetingViewController.participants[index].displayName)")
+                                ZStack {
+                                    ParticipantView(track: meetingViewController.participants[index].streams.first(where: { $1.kind == .state(value: .video) })?.value.track as? RTCVideoTrack).frame(height: 250)
+                                    if meetingViewController.participants[index].streams.first(where: { $1.kind == .state(value: .video) }) == nil {
+                                        Color.white.opacity(1.0).frame(width: UIScreen.main.bounds.width, height: 250)
+                                        Text("No media")
                                     }
                                 }
                             }
+                        }
                     }
-
+                    
                     VStack {
                         HStack(spacing: 15) {
                             // mic button
@@ -115,11 +115,12 @@ struct MeetingView: View{
                                         RoundedRectangle(cornerRadius: 25)
                                             .fill(Color.blue))
                             }
-
+                            
                             // end meeting button
                             Button {
                                 meetingViewController.meeting?.end()
                                 presentationMode.wrappedValue.dismiss()
+                                
                             } label: {
                                 Text("End Call")
                                     .foregroundStyle(Color.white)
@@ -136,7 +137,7 @@ struct MeetingView: View{
             }
         }.onAppear()
         {
-            userData.UpdateCallAPI()
+            //            userData.UpdateCallAPI()
             /// MARK :- configuring the videoSDK
             VideoSDK.config(token: meetingViewController.token)
             if meetingId?.isEmpty == false {
@@ -144,26 +145,27 @@ struct MeetingView: View{
                 meetingViewController.joinMeeting(meetingId: meetingId!, userName: userName!)
             }
             else {
-//                // create a new meeting
-//                meetingViewController.joinRoom(userName: userName!)
+                //                // create a new meeting
+                //                meetingViewController.joinRoom(userName: userName!)
             }
         }
-    }
+    }    
+
 }
 
 /// VideoView for participant's video
 class VideoView: UIView {
-
+    
     var videoView: RTCMTLVideoView = {
         let view = RTCMTLVideoView()
         view.videoContentMode = .scaleAspectFill
         view.backgroundColor = UIColor.black
         view.clipsToBounds = true
         view.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 250)
-
+        
         return view
     }()
-
+    
     init(track: RTCVideoTrack?) {
         super.init(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 250))
         backgroundColor = .clear
@@ -173,7 +175,7 @@ class VideoView: UIView {
             track?.add(self.videoView)
         }
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -182,13 +184,13 @@ class VideoView: UIView {
 /// ParticipantView for showing and hiding VideoView
 struct ParticipantView: UIViewRepresentable {
     var track: RTCVideoTrack?
-
+    
     func makeUIView(context: Context) -> VideoView {
         let view = VideoView(track: track)
         view.frame = CGRect(x: 0, y: 0, width: 250, height: 250)
         return view
     }
-
+    
     func updateUIView(_ uiView: VideoView, context: Context) {
         if track != nil {
             track?.add(uiView.videoView)
