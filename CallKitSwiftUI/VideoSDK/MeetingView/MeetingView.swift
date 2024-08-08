@@ -16,7 +16,8 @@ struct MeetingView: View{
     // instance of MeetingViewController which we will implement in next step
     @ObservedObject var meetingViewController = MeetingViewController()
     // Variables for keeping the state of various controls
-     @State var meetingId: String? = "00kq-7nyo-1e49"
+    
+     @State var meetingId: String?
      @State var userName: String? = "Demo"
      @State var isUnMute: Bool = true
      @State var camEnabled: Bool = true
@@ -143,8 +144,8 @@ struct MeetingView: View{
                 meetingViewController.joinMeeting(meetingId: meetingId!, userName: userName!)
             }
             else {
-                // create a new meeting
-                meetingViewController.joinRoom(userName: userName!)
+//                // create a new meeting
+//                meetingViewController.joinRoom(userName: userName!)
             }
         }
     }

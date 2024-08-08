@@ -22,6 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private var captureSession: AVCaptureSession?
     // Store caller IDs
     var callerIDs: [UUID: String] = [:]
+    var meetingIDs = [UUID: String]()
+    var currentMeetingID: String?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -73,20 +75,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     
     // MARK: - Handle Incoming Calls with CallKit
-    func reportIncomingCall(callerName: String) {
+    func reportIncomingCall(callerName: String,meetingId: String) {
         let uuid = UUID()
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: callerName)
         update.localizedCallerName = callerName
         
         callerIDs[uuid] = callerName
+        meetingIDs[uuid] = meetingId
         
         self.callProvider.reportNewIncomingCall(with: uuid, update: update) { error in
             if let error = error {
                 print("Error reporting incoming call: \(error)")
             }
         }
+        
     }
+    
+    func handleIncomingCallRequest(data: Data) {
+        do {
+            let callRequest = try JSONDecoder().decode(CallRequest.self, from: data)
+            let callerName = callRequest.callerInfo.name
+            let meetingId = callRequest.videoSDKInfo.meetingId
+            print("Received Meeting ID: \(meetingId)")
+            print("Caller Name: \(callerName)")
+            
+            // Report the incoming call to CallKit
+            reportIncomingCall(callerName: callerName, meetingId: meetingId)
+            
+        } catch {
+            print("Failed to decode CallRequest: \(error)")
+        }
+    }
+
+
 
     // MARK: - Microphone Audio Session Management
     func requestMicrophonePermission() {
@@ -272,6 +294,11 @@ extension AppDelegate: PKPushRegistryDelegate {
         print("Stored callerID in OtherUserIDManager: \(OtherUserIDManager.SharedOtherUID.OtherUIDOf ?? "Not set")")
         
         let videoSDKInfo = payloadDict["videoSDKInfo"] as? [String: Any]
+        let meetingId = videoSDKInfo?["meetingId"] as? String ?? "Unknown Meeting ID"
+        print("Extracted meeting ID: \(meetingId)")
+        
+        MeetingManager.shared.currentMeetingID = meetingId
+        
         
         if UIApplication.shared.applicationState == .active {
             DispatchQueue.main.async {
@@ -296,7 +323,7 @@ extension AppDelegate: PKPushRegistryDelegate {
         }
 
         // Report incoming call with caller name and ID
-        self.reportIncomingCall(callerName: callerName)
+        self.reportIncomingCall(callerName: callerName, meetingId: meetingId)
         
         completion()
     }

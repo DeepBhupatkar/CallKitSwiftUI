@@ -22,8 +22,18 @@ class MeetingViewController: ObservableObject {
     @Published var meetingID: String = ""
 
     func initializeMeeting(meetingId: String, userName: String) {
+        
+//        let meetingId = MeetingIDManagerExtra.shared.meetingIDss ?? meetingId
+//        guard let validMeetingId = meetingId else {
+//            print("No valid meeting ID found")
+//            return
+//        }
+
+        // Now you can use validMeetingId safely
+
+        
         meeting = VideoSDK.initMeeting(
-            meetingId: "00kq-7nyo-1e49",
+            meetingId:MeetingManager.shared.currentMeetingID!,
             participantName: "iPhone",
             micEnabled: true,
             webcamEnabled: true
@@ -64,7 +74,6 @@ extension MeetingViewController: MeetingEventListener {
     }
 
     func onMeetingLeft() {
-
         print("HEre")
         meeting?.localParticipant.removeEventListener(self)
         meeting?.removeEventListener(self)
@@ -115,36 +124,36 @@ extension MeetingViewController: ParticipantEventListener {
 }
 
 extension MeetingViewController {
-    // create a new meeting id
-    func joinRoom(userName: String) {
-
-        let urlString = "https://api.videosdk.live/v2/rooms"
-        let session = URLSession.shared
-        let url = URL(string: urlString)!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue(self.token, forHTTPHeaderField: "Authorization")
-
-        session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) in
-
-            if let data = data, let utf8Text = String(data: data, encoding: .utf8)
-            {
-                print("UTF =>=>\(utf8Text)") // original server data as UTF8 string
-                do{
-                    let dataArray = try JSONDecoder().decode(RoomsStruct.self,from: data)
-                    DispatchQueue.main.async {
-                        print(dataArray.roomID)
-                        self.meetingID = dataArray.roomID!
-                        self.joinMeeting(meetingId: dataArray.roomID!, userName: userName)
-                    }
-                    print(dataArray)
-                } catch {
-                    print(error)
-                }
-            }
-        }
-        ).resume()
-    }
+//    // create a new meeting id
+//    func joinRoom(userName: String) {
+//
+//        let urlString = "https://api.videosdk.live/v2/rooms"
+//        let session = URLSession.shared
+//        let url = URL(string: urlString)!
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "POST"
+//        request.addValue(self.token, forHTTPHeaderField: "Authorization")
+//
+//        session.dataTask(with: request, completionHandler: { (data: Data?, response: URLResponse?, error: Error?) in
+//
+//            if let data = data, let utf8Text = String(data: data, encoding: .utf8)
+//            {
+//                print("UTF =>=>\(utf8Text)") // original server data as UTF8 string
+//                do{
+//                    let dataArray = try JSONDecoder().decode(RoomsStruct.self,from: data)
+//                    DispatchQueue.main.async {
+//                        print(dataArray.roomID)
+//                        self.meetingID = dataArray.roomID!
+//                        self.joinMeeting(meetingId: dataArray.roomID!, userName: userName)
+//                    }
+//                    print(dataArray)
+//                } catch {
+//                    print(error)
+//                }
+//            }
+//        }
+//        ).resume()
+//    }
 
     // initialise a meeting with give meeting id (either new or existing)
     func joinMeeting(meetingId: String, userName: String) {

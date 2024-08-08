@@ -7,6 +7,9 @@
 
 import Foundation
 
+
+
+
 // USER A : the user who Initiate the call to other user (USER B)
 struct CallerInfo: Codable {
     let id: String
@@ -28,7 +31,7 @@ struct CalleeInfo: Codable {
 }
 //Meeting Info Can Be Static
 struct VideoSDKInfo: Codable {
-    var id: String = "123"
+    var meetingId: String = MeetingManager.shared.currentMeetingID ?? "null"
     var name: String = "VideoSDKExample"
     var callerID: String = "12341241"
     var deviceToken : String = "123412413423"

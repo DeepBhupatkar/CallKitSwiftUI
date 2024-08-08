@@ -11,6 +11,7 @@
 		2C4C11202C5C9808000F0D1B /* RoomsStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C111F2C5C9808000F0D1B /* RoomsStruct.swift */; };
 		2C4C11232C5C9A2D000F0D1B /* MeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C11222C5C9A2D000F0D1B /* MeetingView.swift */; };
 		2C4C11252C5C9A56000F0D1B /* MeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4C11242C5C9A56000F0D1B /* MeetingViewController.swift */; };
+		2C5DC5B82C637B74004FD419 /* TokenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C5DC5B72C637B74004FD419 /* TokenManager.swift */; };
 		2C64D1902C5CD4F600C6DE81 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 2C64D18F2C5CD4F600C6DE81 /* FirebaseMessaging */; };
 		2C6F86B42C58E53000A2527E /* CallKitSwiftUIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6F86B32C58E53000A2527E /* CallKitSwiftUIApp.swift */; };
 		2C6F86B82C58E53100A2527E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C6F86B72C58E53100A2527E /* Assets.xcassets */; };
@@ -35,6 +36,7 @@
 		2C4C111F2C5C9808000F0D1B /* RoomsStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsStruct.swift; sourceTree = "<group>"; };
 		2C4C11222C5C9A2D000F0D1B /* MeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingView.swift; sourceTree = "<group>"; };
 		2C4C11242C5C9A56000F0D1B /* MeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingViewController.swift; sourceTree = "<group>"; };
+		2C5DC5B72C637B74004FD419 /* TokenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenManager.swift; sourceTree = "<group>"; };
 		2C6F86B02C58E53000A2527E /* CallKitSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CallKitSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C6F86B32C58E53000A2527E /* CallKitSwiftUIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallKitSwiftUIApp.swift; sourceTree = "<group>"; };
 		2C6F86B72C58E53100A2527E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -153,6 +155,7 @@
 			children = (
 				2CD096E62C5A1C1F00391D2E /* InitiateCallInfo.swift */,
 				2C6F86D62C58FF4E00A2527E /* User.swift */,
+				2C5DC5B72C637B74004FD419 /* TokenManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 				2C6F86B42C58E53000A2527E /* CallKitSwiftUIApp.swift in Sources */,
 				2CD096E32C59F1BB00391D2E /* AppDelegate.swift in Sources */,
 				2CD096E72C5A1C1F00391D2E /* InitiateCallInfo.swift in Sources */,
+				2C5DC5B82C637B74004FD419 /* TokenManager.swift in Sources */,
 				2C4C11202C5C9808000F0D1B /* RoomsStruct.swift in Sources */,
 				2C6F86D92C58FF6C00A2527E /* UserData.swift in Sources */,
 				2CA541A22C5B43A800F2A877 /* CallingView.swift in Sources */,
