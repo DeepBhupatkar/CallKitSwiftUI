@@ -17,6 +17,9 @@ class UserData: ObservableObject {
     @Published public var otherUserID: String = ""
     static let shared = UserData()
     private let callerIDKey = "callerIDKey" // Key for UserDefaults
+    
+    let TOKEN_STRING = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJkYWUzNjU0Ny01Y2Y1LTQ1MGItYTE1My1hYzhhNDcyYjc3NzkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcyMTEyNzYxMCwiZXhwIjoxNzIzNzE5NjEwfQ.mr1iOtcRF9Ofjm1kSN5jq8PNd6xoZ0tmOtdZlovZBis"
+    
 
     // MARK: Generating Unqiue CallerID
     
@@ -136,44 +139,98 @@ class UserData: ObservableObject {
                     }
                 }
             }
+
     }
     
     // MARK: InitiateCall Function
     
+//    func initiateCall(otherUserID: String, completion: @escaping (CallerInfo?, CalleeInfo?, VideoSDKInfo?) -> Void) {
+//        
+//        fetchCallerInfo { callerInfo in
+//            guard let callerInfo = callerInfo else {
+//                print("Error fetching caller info")
+//                completion(nil, nil, nil)
+//                return
+//            }
+//            
+//            self.fetchCalleeInfo(callerID: otherUserID) { calleeInfo in
+//                guard let calleeInfo = calleeInfo else {
+//                    print("Error fetching callee info")
+//                    completion(nil, nil, nil)
+//                    return
+//                    
+//                    }
+//                
+//                let videoSDKInfo = VideoSDKInfo()
+//                completion(callerInfo, calleeInfo, videoSDKInfo)
+//                
+//                // Create a CallRequest
+//                let callRequest = CallRequest(callerInfo: callerInfo, calleeInfo: calleeInfo, videoSDKInfo: videoSDKInfo)
+//                self.sendCallRequest(callRequest) { result in
+//                    switch result {
+//                    case .success(let data):
+//                        // Handle successful response
+//                        print("Call request successful: \(String(describing: data))")
+//                    case .failure(let error):
+//                        // Handle error
+//                        print("Error sending call request: \(error)")
+//                    }
+//                }
+//            }
+//        }
+//    }
+    
     func initiateCall(otherUserID: String, completion: @escaping (CallerInfo?, CalleeInfo?, VideoSDKInfo?) -> Void) {
-        
         fetchCallerInfo { callerInfo in
             guard let callerInfo = callerInfo else {
                 print("Error fetching caller info")
                 completion(nil, nil, nil)
                 return
             }
-            
+
             self.fetchCalleeInfo(callerID: otherUserID) { calleeInfo in
                 guard let calleeInfo = calleeInfo else {
                     print("Error fetching callee info")
                     completion(nil, nil, nil)
                     return
                 }
-                
-                let videoSDKInfo = VideoSDKInfo()
-                completion(callerInfo, calleeInfo, videoSDKInfo)
-                
-                // Create a CallRequest
-                let callRequest = CallRequest(callerInfo: callerInfo, calleeInfo: calleeInfo, videoSDKInfo: videoSDKInfo)
-                self.sendCallRequest(callRequest) { result in
+
+                // Create meeting before creating VideoSDKInfo
+                self.createMeeting(token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJkYWUzNjU0Ny01Y2Y1LTQ1MGItYTE1My1hYzhhNDcyYjc3NzkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcyMTEyNzYxMCwiZXhwIjoxNzIzNzE5NjEwfQ.mr1iOtcRF9Ofjm1kSN5jq8PNd6xoZ0tmOtdZlovZBis") { result in
                     switch result {
-                    case .success(let data):
-                        // Handle successful response
-                        print("Call request successful: \(String(describing: data))")
+                    case .success(let roomID):
+                        print("Meeting created successfully with Room ID: \(roomID)")
+                       
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            let videoSDKInfo = VideoSDKInfo()
+
+                            // Proceed with the remaining code
+                            completion(callerInfo, calleeInfo, videoSDKInfo)
+
+                            // Create a CallRequest
+                            let callRequest = CallRequest(callerInfo: callerInfo, calleeInfo: calleeInfo, videoSDKInfo: videoSDKInfo)
+                            self.sendCallRequest(callRequest) { result in
+                                switch result {
+                                case .success(let data):
+                                    // Handle successful response
+                                    print("Call request successful: \(String(describing: data))")
+                                case .failure(let error):
+                                    // Handle error
+                                    print("Error sending call request: \(error)")
+                                }
+                            }
+                        }
+                        
                     case .failure(let error):
-                        // Handle error
-                        print("Error sending call request: \(error)")
+                        print("Error creating meeting: \(error)")
+                        completion(nil, nil, nil)
                     }
                 }
             }
         }
     }
+
+    
     
    /// MARK: APIs Calls
     
@@ -211,10 +268,62 @@ class UserData: ObservableObject {
     
     //MARK:  API Calling For Update Call
 
-    public func UpdateCallAPI() {
-        
+//    public func UpdateCallAPI() {
+//        
+//        let storedCallerID = OtherUserIDManager.SharedOtherUID.OtherUIDOf
+//        
+//        fetchCalleeInfo(callerID: storedCallerID ?? "null") { calleeInfo in
+//            guard let calleeInfo = calleeInfo else {
+//                print("No callee info found")
+//                return
+//            }
+//            
+//            guard let url = URL(string: "http://172.20.10.3:3000/update-call") else {
+//                print("Invalid URL")
+//                return
+//            }
+//            
+//            var request = URLRequest(url: url)
+//            request.httpMethod = "POST"
+//            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+//            
+//            let callerInfoDict: [String: Any] = [
+//                "id": calleeInfo.id,
+//                "name": calleeInfo.name,
+//                "callerID": calleeInfo.callerID,
+//                "deviceToken": calleeInfo.deviceToken ?? "",
+//                "fcmToken": calleeInfo.fcmToken ?? ""
+//            ]
+//            
+//            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": "someType"]
+//            do {
+//                request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+//            } catch {
+//                print("Error encoding request body: \(error)")
+//                return
+//            }
+//            
+//            URLSession.shared.dataTask(with: request) { data, response, error in
+//                if let error = error {
+//                    print("API call error: \(error)")
+//                    return
+//                }
+//                
+//                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+//                    print("Invalid response")
+//                    return
+//                }
+//                
+//                if let data = data {
+//                    print("Response data: \(String(data: data, encoding: .utf8) ?? "")")
+//                }
+//            }.resume()
+//        }
+//    }
+    
+    public func UpdateCallAPI(callType: String) {
         let storedCallerID = OtherUserIDManager.SharedOtherUID.OtherUIDOf
-        
+
         fetchCalleeInfo(callerID: storedCallerID ?? "null") { calleeInfo in
             guard let calleeInfo = calleeInfo else {
                 print("No callee info found")
@@ -238,7 +347,7 @@ class UserData: ObservableObject {
                 "fcmToken": calleeInfo.fcmToken ?? ""
             ]
             
-            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": "someType"]
+            let body: [String: Any] = ["callerInfo": callerInfoDict, "type": callType]
             do {
                 request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
             } catch {
@@ -263,39 +372,44 @@ class UserData: ObservableObject {
             }.resume()
         }
     }
+
+    
+   
+    func createMeeting(token: String, completion: @escaping (Result<String, Error>) -> Void) {
+        let url = URL(string: "https://api.videosdk.live/v2/rooms")!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue(token, forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { (data, response, error) in
+            DispatchQueue.main.async {
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                
+                if let data = data {
+                    do {
+                        let dataArray = try JSONDecoder().decode(RoomsStruct.self, from: data)
+                        let roomID = dataArray.roomID ?? ""
+                        // Store the meeting ID
+                        MeetingManager.shared.currentMeetingID = roomID
+                        completion(.success(roomID))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                } else {
+                    let noDataError = NSError(domain: "No data", code: 500, userInfo: nil)
+                    completion(.failure(noDataError))
+                }
+            }
+        }.resume()
+    }
+
+
     
     
-}
-
-
-
-
-/// MARK: Singleton Class For Device,FMC Token Store and For OtherUserID
-
-//MARK: DeviceTokenManager
-
-class DeviceTokenManager {
-    static let shared = DeviceTokenManager()
-    private init() {}
-
-    var deviceToken: String?
-}
-//MARK: FCMTokenManager
-
-class FCMTokenManager{
     
-    static let sharedFCM = FCMTokenManager()
-    private init() {}
     
-    var FCMTokenOfDevice: String?
-}
-
-//MARK: OtherUserManager
-
-class OtherUserIDManager{
-    
-    static let SharedOtherUID = OtherUserIDManager()
-    private init() {}
-    
-    var OtherUIDOf: String?
 }

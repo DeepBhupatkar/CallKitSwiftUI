@@ -18,6 +18,9 @@ struct JoinView: View {
     @State private var userName: String = ""
     @State private var userNumber: String = ""
     
+
+    
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 30) {
@@ -62,7 +65,7 @@ struct JoinView: View {
                         .foregroundColor(.white)
 
                     TextField("Enter ID", text: $otherUserID)
-                        .keyboardType(.numberPad)
+//                        .keyboardType(.numberPad)
                         .foregroundColor(.black)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.horizontal)
@@ -95,7 +98,7 @@ struct JoinView: View {
                 .padding(.trailing)
                 Spacer()
 
-                NavigationLink(destination: MeetingView(), isActive: $isCallViewActive) {
+                NavigationLink(destination: MeetingView(meetingId:MeetingManager.shared.currentMeetingID), isActive: $isCallViewActive) {
                     EmptyView()
                 }
 

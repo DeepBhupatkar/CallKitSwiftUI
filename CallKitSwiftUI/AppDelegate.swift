@@ -12,6 +12,7 @@ import UserNotifications
 import AVFoundation
 import FirebaseCore
 import FirebaseMessaging
+import SwiftUI
 
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
     
@@ -22,6 +23,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private var captureSession: AVCaptureSession?
     // Store caller IDs
     var callerIDs: [UUID: String] = [:]
+    var meetingIDs = [UUID: String]()
+    var currentMeetingID: String?
+    var receivedCallType: String?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -51,6 +55,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         return true
     }
+
+    func navigateToJoinView() {
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first {
+                window.rootViewController = UIHostingController(rootView: JoinView())
+                window.makeKeyAndVisible()
+            }
+        }
+    }
     
     // MARK: - Registering Device And Pushing
         private func registerUserIfNeeded() {
@@ -73,20 +87,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     
     // MARK: - Handle Incoming Calls with CallKit
-    func reportIncomingCall(callerName: String) {
+    func reportIncomingCall(callerName: String,meetingId: String) {
         let uuid = UUID()
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: callerName)
         update.localizedCallerName = callerName
         
         callerIDs[uuid] = callerName
+        meetingIDs[uuid] = meetingId
         
         self.callProvider.reportNewIncomingCall(with: uuid, update: update) { error in
             if let error = error {
                 print("Error reporting incoming call: \(error)")
             }
         }
+        
     }
+    
+    func handleIncomingCallRequest(data: Data) {
+        do {
+            let callRequest = try JSONDecoder().decode(CallRequest.self, from: data)
+            let callerName = callRequest.callerInfo.name
+            let meetingId = callRequest.videoSDKInfo.meetingId
+            print("Received Meeting ID: \(meetingId)")
+            print("Caller Name: \(callerName)")
+            
+            // Report the incoming call to CallKit
+            reportIncomingCall(callerName: callerName, meetingId: meetingId)
+            
+        } catch {
+            print("Failed to decode CallRequest: \(error)")
+        }
+    }
+
+
 
     // MARK: - Microphone Audio Session Management
     func requestMicrophonePermission() {
@@ -217,28 +251,39 @@ extension AppDelegate {
         if let messageID = userInfo["gcm.message_id"] {
             print("Message ID: \(messageID)")
         }
+        
+        if let callStatus = userInfo["type"] as? String {
+            receivedCallType = callStatus
+            print("Call status stored: \(receivedCallType ?? "Unknown")") // This should now print
+        } else {
+            print("Call status not found in notification payload")
+        }
+        
         handleNotification(notification: notification)
         completionHandler([.alert, .badge, .sound])
     }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
-        print("Notification received with userInfo: \(userInfo)")
-        
-        if let messageID = userInfo["gcm.message_id"] {
-            print("Message ID: \(messageID)")
-        }
-        
-        handleNotification(notification: response.notification)
-        completionHandler()
-    }
-    
-    private func handleNotification(notification: UNNotification) {
-           // Update the shared notification manager
-        NotificationManager.shared.handleNotification(notification: notification)
-
+       
+       func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+           let userInfo = response.notification.request.content.userInfo
+           print("Notification received with userInfo: \(userInfo)")
+           
+           if let messageID = userInfo["gcm.message_id"] {
+               print("Message ID: \(messageID)")
+           }
+           
+           handleNotification(notification: response.notification)
+           completionHandler()
        }
-    
+       
+       private func handleNotification(notification: UNNotification) {
+           if receivedCallType == "ACCEPTED" {
+               print("Inside handleNotification: Call Accepted")
+               NotificationManager.shared.handleNotification(notification: notification)
+           } else {
+               navigateToJoinView()
+           }
+       }
 }
 
 // MARK: - PKPushRegistryDelegate
@@ -253,53 +298,53 @@ extension AppDelegate: PKPushRegistryDelegate {
     func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
         print("Push token invalidated for type: \(type)")
     }
-    
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        let payloadDict = payload.dictionaryPayload
-        
-        print("Full payload: \(payloadDict)")
-        
-        // Extract caller info
-        let callerInfo = payloadDict["callerInfo"] as? [String: Any]
-        let callerName = callerInfo?["name"] as? String ?? "Unknown Caller"
-        let callerID = callerInfo?["callerID"] as? String ?? "Unknown ID"
-        
-        // Store the callerID in OtherUserIDManager
-        OtherUserIDManager.SharedOtherUID.OtherUIDOf = callerID
- 
-        print("Extracted caller name: \(callerName)")
-        print("Extracted caller ID: \(callerID)")
-        print("Stored callerID in OtherUserIDManager: \(OtherUserIDManager.SharedOtherUID.OtherUIDOf ?? "Not set")")
-        
-        let videoSDKInfo = payloadDict["videoSDKInfo"] as? [String: Any]
-        
-        if UIApplication.shared.applicationState == .active {
-            DispatchQueue.main.async {
-                let alert = UIAlertController(title: "Incoming Call", message: "Call from \(callerName)", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self.window?.rootViewController?.present(alert, animated: true)
-            }
-        } else {
-            let content = UNMutableNotificationContent()
-            content.title = "Incoming Call"
-            content.body = "Call from \(callerName)"
-            content.badge = NSNumber(value: 0)
-            content.sound = .default
-
-            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-            let request = UNNotificationRequest(identifier: "VoIPNotification", content: content, trigger: trigger)
-            UNUserNotificationCenter.current().add(request) { error in
-                if let error = error {
-                    print("Error adding notification request: \(error)")
-                }
-            }
-        }
-
-        // Report incoming call with caller name and ID
-        self.reportIncomingCall(callerName: callerName)
-        
-        completion()
-    }
+          let payloadDict = payload.dictionaryPayload
+          
+          print("Full payload: \(payloadDict)")
+          // Extract caller info
+          let callerInfo = payloadDict["callerInfo"] as? [String: Any]
+          let callerName = callerInfo?["name"] as? String ?? "Unknown Caller"
+          let callerID = callerInfo?["callerID"] as? String ?? "Unknown ID"
+          
+          // Store the callerID in OtherUserIDManager
+          OtherUserIDManager.SharedOtherUID.OtherUIDOf = callerID
+          
+          print("Extracted caller name: \(callerName)")
+          print("Extracted caller ID: \(callerID)")
+          print("Stored callerID in OtherUserIDManager: \(OtherUserIDManager.SharedOtherUID.OtherUIDOf ?? "Not set")")
+          
+          let videoSDKInfo = payloadDict["videoSDKInfo"] as? [String: Any]
+          let meetingId = videoSDKInfo?["meetingId"] as? String ?? "Unknown Meeting ID"
+          print("Extracted meeting ID: \(meetingId)")
+          MeetingManager.shared.currentMeetingID = meetingId
+          
+          if UIApplication.shared.applicationState == .active {
+              DispatchQueue.main.async {
+                  let alert = UIAlertController(title: "Incoming Call", message: "Call from \(callerName)", preferredStyle: .alert)
+                  alert.addAction(UIAlertAction(title: "OK", style: .default))
+                  self.window?.rootViewController?.present(alert, animated: true)
+              }
+          } else {
+              let content = UNMutableNotificationContent()
+              content.title = "Incoming Call"
+              content.body = "Call from \(callerName)"
+              content.badge = NSNumber(value: 0)
+              content.sound = .default
+              
+              let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+              let request = UNNotificationRequest(identifier: "VoIPNotification", content: content, trigger: trigger)
+              UNUserNotificationCenter.current().add(request) { error in
+                  if let error = error {
+                      print("Error adding notification request: \(error)")
+                  }
+              }
+          }
+          // Report incoming call with caller name and ID
+          self.reportIncomingCall(callerName: callerName, meetingId: meetingId)
+          
+          completion()
+      }
 }
 
 // MARK: - CXProviderDelegate
@@ -313,13 +358,14 @@ extension AppDelegate: CXProviderDelegate {
         provider.reportCall(with: action.callUUID, updated: update)
         action.fulfill()
     }
-    
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         configureAudioSession()
         if let callerID = callerIDs[action.callUUID] {
             print("Establishing call connection with caller ID: \(callerID)")
         }
         NotificationCenter.default.post(name: .callAnswered, object: nil)
+        var userData = UserData()
+        userData.UpdateCallAPI(callType: "ACCEPTED")
         action.fulfill()
     }
     
@@ -328,8 +374,11 @@ extension AppDelegate: CXProviderDelegate {
         let meetingViewController = MeetingViewController()
         meetingViewController.onMeetingLeft()
         action.fulfill()
+        var userData = UserData()
+        userData.UpdateCallAPI(callType: "REJECTED")
+        navigateToJoinView()
     }
-    
+
     func providerDidReset(_ provider: CXProvider) {
         callerIDs.removeAll()
     }
