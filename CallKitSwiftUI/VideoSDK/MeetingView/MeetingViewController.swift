@@ -11,6 +11,8 @@ import WebRTC
 
 class MeetingViewController: ObservableObject {
     
+    static let shared = MeetingViewController()
+    
     var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJkYWUzNjU0Ny01Y2Y1LTQ1MGItYTE1My1hYzhhNDcyYjc3NzkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcyMTEyNzYxMCwiZXhwIjoxNzIzNzE5NjEwfQ.mr1iOtcRF9Ofjm1kSN5jq8PNd6xoZ0tmOtdZlovZBis"
     var meetingId: String = ""
     var name: String = ""
@@ -22,16 +24,6 @@ class MeetingViewController: ObservableObject {
     @Published var meetingID: String = ""
     
     func initializeMeeting(meetingId: String, userName: String) {
-        
-        //        let meetingId = MeetingIDManagerExtra.shared.meetingIDss ?? meetingId
-        //        guard let validMeetingId = meetingId else {
-        //            print("No valid meeting ID found")
-        //            return
-        //        }
-        
-        // Now you can use validMeetingId safely
-        
-        
         meeting = VideoSDK.initMeeting(
             meetingId:MeetingManager.shared.currentMeetingID!,
             participantName: "iPhone",
@@ -76,6 +68,7 @@ extension MeetingViewController: MeetingEventListener {
     func onMeetingLeft() {
         meeting?.localParticipant.removeEventListener(self)
         meeting?.removeEventListener(self)
+        
     }
     
     func onMeetingStateChanged(meetingState: MeetingState) {

@@ -9,26 +9,26 @@ import SwiftUI
 import VideoSDKRTC
 import WebRTC
 
-struct MeetingView: View{
+struct MeetingView: View {
     
     @Environment(\.presentationMode) var presentationMode
-    
-    // instance of MeetingViewController which we will implement in next step
     @ObservedObject var meetingViewController = MeetingViewController()
-    // Variables for keeping the state of various controls
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     @State var meetingId: String?
     @State var userName: String? = "Demo"
     @State var isUnMute: Bool = true
     @State var camEnabled: Bool = true
     @State var isScreenShare: Bool = false
+    @State var isCallActive: Bool = true  // State to track if the call is active
     
     var userData = UserData()
     
     var body: some View {
         
         VStack {
-            if meetingViewController.participants.count == 0 {
+            if meetingViewController.participants.isEmpty {
                 Text("Meeting Initializing")
             } else {
                 VStack {
@@ -52,15 +52,13 @@ struct MeetingView: View{
                     
                     VStack {
                         HStack(spacing: 15) {
-                            // mic button
+                            // Mic button
                             Button {
+                                isUnMute.toggle()
                                 if isUnMute {
-                                    isUnMute = false
-                                    meetingViewController.meeting?.muteMic()
-                                }
-                                else {
-                                    isUnMute = true
                                     meetingViewController.meeting?.unmuteMic()
+                                } else {
+                                    meetingViewController.meeting?.muteMic()
                                 }
                             } label: {
                                 Text("Toggle Mic")
@@ -71,15 +69,14 @@ struct MeetingView: View{
                                         RoundedRectangle(cornerRadius: 25)
                                             .fill(Color.blue))
                             }
-                            // camera button
+                            
+                            // Camera button
                             Button {
+                                camEnabled.toggle()
                                 if camEnabled {
-                                    camEnabled = false
-                                    meetingViewController.meeting?.disableWebcam()
-                                }
-                                else {
-                                    camEnabled = true
                                     meetingViewController.meeting?.enableWebcam()
+                                } else {
+                                    meetingViewController.meeting?.disableWebcam()
                                 }
                             } label: {
                                 Text("Toggle WebCam")
@@ -91,19 +88,18 @@ struct MeetingView: View{
                                             .fill(Color.blue))
                             }
                         }
-                        HStack{
-                            // screenshare button (OPTIONAL)
+                        
+                        HStack {
+                            // Screen share button
                             Button {
+                                isScreenShare.toggle()
                                 if isScreenShare {
-                                    isScreenShare = false
-                                    Task {
-                                        await meetingViewController.meeting?.disableScreenShare()
-                                    }
-                                }
-                                else {
-                                    isScreenShare = true
                                     Task {
                                         await meetingViewController.meeting?.enableScreenShare()
+                                    }
+                                } else {
+                                    Task {
+                                        await meetingViewController.meeting?.disableScreenShare()
                                     }
                                 }
                             } label: {
@@ -116,11 +112,11 @@ struct MeetingView: View{
                                             .fill(Color.blue))
                             }
                             
-                            // end meeting button
+                            // End meeting button
                             Button {
-                                meetingViewController.meeting?.end()
-                                presentationMode.wrappedValue.dismiss()
-                                
+                                DispatchQueue.main.async {
+                                     endCallFromSwiftUI()
+                                 }
                             } label: {
                                 Text("End Call")
                                     .foregroundStyle(Color.white)
@@ -135,23 +131,32 @@ struct MeetingView: View{
                     }
                 }
             }
-        }.onAppear()
-        {
-            //            userData.UpdateCallAPI()
-            /// MARK :- configuring the videoSDK
+        }
+        .onAppear {
+            // Configure VideoSDK and join/create meeting
             VideoSDK.config(token: meetingViewController.token)
-            if meetingId?.isEmpty == false {
-                // join an existing meeting with provided meeting Id
-                meetingViewController.joinMeeting(meetingId: meetingId!, userName: userName!)
-            }
-            else {
-                //                // create a new meeting
-                //                meetingViewController.joinRoom(userName: userName!)
+            if let meetingId = meetingId, !meetingId.isEmpty {
+                meetingViewController.joinMeeting(meetingId: meetingId, userName: userName ?? "Unknown")
             }
         }
-    }    
-
+    }
+    
+    // Function to end call and handle necessary cleanup
+    func endCallFromSwiftUI() {
+        print("Calling endCall from SwiftUI")
+//        DispatchQueue.main.async {
+            guard isCallActive else {
+                print("No active call to end")
+                return
+            }
+            meetingViewController.meeting?.end()
+            appDelegate.endCall()  // Call AppDelegate method to end the call
+            isCallActive = false   // Set call state to inactive
+            presentationMode.wrappedValue.dismiss()
+//        }
+    }
 }
+
 
 /// VideoView for participant's video
 class VideoView: UIView {

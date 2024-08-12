@@ -17,10 +17,7 @@ struct JoinView: View {
     @State private var isCallingViewActive: Bool = false
     @State private var userName: String = ""
     @State private var userNumber: String = ""
-    
 
-    
-    
     var body: some View {
         NavigationView {
             VStack(spacing: 30) {

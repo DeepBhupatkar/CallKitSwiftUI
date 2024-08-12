@@ -18,6 +18,7 @@ class DeviceTokenManager {
 
     var deviceToken: String?
 }
+
 //MARK: FCMTokenManager
 
 class FCMTokenManager{
@@ -38,7 +39,7 @@ class OtherUserIDManager{
     var OtherUIDOf: String?
 }
 
-//
+//MARK: MeetingManager For keeping Track of meetingID
 
 class MeetingManager {
     static let shared = MeetingManager()
@@ -52,4 +53,34 @@ class MeetingManager {
             UserDefaults.standard.set(newValue, forKey: "currentMeetingID")
         }
     }
+}
+
+//MARK: CallManager
+
+class CallManager {
+    static let shared = CallManager()
+    
+    private init() {}
+    
+    var activeCallUUID: UUID?
+    var callerIDs: [UUID: String] = [:]
+    
+    func clearActiveCall() {
+        activeCallUUID = nil
+    }
+    
+    func addCallerID(uuid: UUID, callerID: String) {
+        callerIDs[uuid] = callerID
+    }
+    
+    func removeCallerID(uuid: UUID) {
+        callerIDs.removeValue(forKey: uuid)
+    }
+    
+    func getCallerID(uuid: UUID) -> String? {
+        return callerIDs[uuid]
+    }
+    func clearAllCallerIDs() {
+          callerIDs.removeAll()
+      }
 }
