@@ -18,7 +18,7 @@ class UserData: ObservableObject {
     static let shared = UserData()
     private let callerIDKey = "callerIDKey" // Key for UserDefaults
     
-    let TOKEN_STRING = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJkYWUzNjU0Ny01Y2Y1LTQ1MGItYTE1My1hYzhhNDcyYjc3NzkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcyMTEyNzYxMCwiZXhwIjoxNzIzNzE5NjEwfQ.mr1iOtcRF9Ofjm1kSN5jq8PNd6xoZ0tmOtdZlovZBis"
+    let TOKEN_STRING = ""
     
 
     // MARK: Generating Unqiue CallerID
@@ -196,7 +196,7 @@ class UserData: ObservableObject {
                 }
 
                 // Create meeting before creating VideoSDKInfo
-                self.createMeeting(token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiJkYWUzNjU0Ny01Y2Y1LTQ1MGItYTE1My1hYzhhNDcyYjc3NzkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcyMTEyNzYxMCwiZXhwIjoxNzIzNzE5NjEwfQ.mr1iOtcRF9Ofjm1kSN5jq8PNd6xoZ0tmOtdZlovZBis") { result in
+                self.createMeeting(token: "") { result in
                     switch result {
                     case .success(let roomID):
                         print("Meeting created successfully with Room ID: \(roomID)")
